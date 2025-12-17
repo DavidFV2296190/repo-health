@@ -12,33 +12,55 @@ export const githubRouter = router({
         repo: z.string(),
       })
     )
-    .query(async ({ input }) => {
-      const info = await githubService.getRepoInfo(input.owner, input.repo);
-      await prisma.repository.upsert({
-        where: {
-          owner_name: {
+    .query(async ({ input, ctx }) => {
+      // Use user's access token if available, otherwise use server token
+      const accessToken = ctx.session?.accessToken;
+
+      try {
+        const info = await githubService.getRepoInfo(
+          input.owner,
+          input.repo,
+          accessToken
+        );
+        await prisma.repository.upsert({
+          where: {
+            owner_name: {
+              owner: input.owner,
+              name: input.repo,
+            },
+          },
+          create: {
             owner: input.owner,
             name: input.repo,
+            url: info.url,
+            isPrivate: info.isPrivate || false,
           },
-        },
-        create: {
-          owner: input.owner,
-          name: input.repo,
+          update: {
+            url: info.url,
+            isPrivate: info.isPrivate || false,
+          },
+        });
+        return {
+          name: info.name,
+          owner: info.owner,
+          description: info.description,
+          stars: info.stars,
+          forks: info.forks,
+          language: info.language,
           url: info.url,
-        },
-        update: {
-          url: info.url,
-        },
-      });
-      return {
-        name: info.name,
-        owner: info.owner,
-        description: info.description,
-        stars: info.stars,
-        forks: info.forks,
-        language: info.language,
-        url: info.url,
-      };
+          isPrivate: info.isPrivate,
+        };
+      } catch (error: any) {
+        if (
+          error.message === "REPO_NOT_FOUND_OR_PRIVATE" ||
+          error.message === "PRIVATE_REPO_REQUIRES_AUTH"
+        ) {
+          throw new Error(
+            "Repository is either private or does not exist. Please sign in to access private repositories."
+          );
+        }
+        throw error;
+      }
     }),
   getCompleteAnalysis: publicProcedure
     .input(
@@ -47,43 +69,71 @@ export const githubRouter = router({
         repo: z.string(),
       })
     )
-    .query(async ({ input }) => {
-      // fetch all data in parallel
-      const [repoInfo, commits, contributors, languages, communityHealth] =
-        await Promise.all([
-          githubService.getRepoInfo(input.owner, input.repo),
-          githubService.getCommits(input.owner, input.repo),
-          githubService.getContributors(input.owner, input.repo),
-          githubService.getLanguages(input.owner, input.repo),
-          githubService.getCommunityHealth(input.owner, input.repo),
-        ]);
-      // Save to database
-      await prisma.repository.upsert({
-        where: {
-          owner_name: {
+    .query(async ({ input, ctx }) => {
+      // Use user's access token if available, otherwise use server token
+      const accessToken = ctx.session?.accessToken;
+
+      try {
+        // check repo access first rather than waiting for all API calls to fail
+        const repoInfo = await githubService.getRepoInfo(
+          input.owner,
+          input.repo,
+          accessToken
+        );
+
+        // Only if repo access succeeds, fetch the rest of the data in parallel
+        const [commits, contributors, languages, communityHealth] =
+          await Promise.all([
+            githubService.getCommits(input.owner, input.repo, accessToken),
+            githubService.getContributors(input.owner, input.repo, accessToken),
+            githubService.getLanguages(input.owner, input.repo, accessToken),
+            githubService.getCommunityHealth(
+              input.owner,
+              input.repo,
+              accessToken
+            ),
+          ]);
+
+        // Save to database
+        await prisma.repository.upsert({
+          where: {
+            owner_name: {
+              owner: input.owner,
+              name: input.repo,
+            },
+          },
+          create: {
             owner: input.owner,
             name: input.repo,
+            url: repoInfo.url,
+            isPrivate: repoInfo.isPrivate || false,
           },
-        },
-        create: {
-          owner: input.owner,
-          name: input.repo,
-          url: repoInfo.url,
-        },
-        update: {
-          url: repoInfo.url,
-          updatedAt: new Date(),
-        },
-      });
-      return {
-        repository: repoInfo,
-        activity: {
-          commits,
-          commitCount: commits.length,
-        },
-        contributors,
-        languages,
-        communityHealth,
-      };
+          update: {
+            url: repoInfo.url,
+            updatedAt: new Date(),
+            isPrivate: repoInfo.isPrivate || false,
+          },
+        });
+        return {
+          repository: repoInfo,
+          activity: {
+            commits,
+            commitCount: commits.length,
+          },
+          contributors,
+          languages,
+          communityHealth,
+        };
+      } catch (error: any) {
+        if (
+          error.message === "REPO_NOT_FOUND_OR_PRIVATE" ||
+          error.message === "PRIVATE_REPO_REQUIRES_AUTH"
+        ) {
+          throw new Error(
+            "Repository is either private or does not exist. Please sign in to access private repositories."
+          );
+        }
+        throw error;
+      }
     }),
 });
