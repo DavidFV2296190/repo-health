@@ -12,31 +12,33 @@ datasource db {
 // Repository model that stores GitHub repo metadata
 model Repository {
   id            String     @id @default(cuid())
-  owner         String     
-  name          String     
+  owner         String
+  name          String
   defaultBranch String     @default("main")
   url           String
+  isPrivate     Boolean    @default(false)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  analyses      Analysis[] 
+  analyses      Analysis[]
 
   @@unique([owner, name])
   @@index([owner, name])
+  @@index([isPrivate])
 }
 
 // Analysis model that  stores health check results
 model Analysis {
-  id               String     @id @default(cuid())
-  repositoryId     String
-  repository       Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  
+  id           String     @id @default(cuid())
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
   overallScore     Int
   activityScore    Int
   communityScore   Int
   maintenanceScore Int
-  
-  analysisData     Json
-  createdAt        DateTime   @default(now())
+
+  analysisData Json
+  createdAt    DateTime @default(now())
 
   @@index([repositoryId])
   @@index([createdAt])
@@ -46,8 +48,61 @@ model Analysis {
 model Contributor {
   id                 String   @id @default(cuid())
   username           String   @unique
-  avatarUrl          String?  
+  avatarUrl          String?
   totalContributions Int      @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+// Authentication models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// OAuth account linkage 
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Email verficiation model
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
