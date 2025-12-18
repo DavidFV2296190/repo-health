@@ -20,6 +20,7 @@ import { RepoSearchInput } from "@/components/repoInput";
 import { AuthButton } from "@/components/AuthButton";
 import { StatCard } from "@/components/cards/StatCard";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingState } from "@/components/LoadingState";
 
 const toaster = createToaster({
   placement: "bottom",
@@ -99,20 +100,7 @@ export default function HomePage() {
             )}
           </Toaster>
 
-          {isLoading && (
-            <Box
-              bg="white"
-              p={12}
-              borderRadius="2xl"
-              boxShadow="2xl"
-              textAlign="center"
-            >
-              <Spinner size="xl" colorPalette="purple" mb={4} />
-              <Text fontSize="lg" color="gray.600">
-                Analyzing repository...
-              </Text>
-            </Box>
-          )}
+          {isLoading && <LoadingState />}
           {data && !isLoading && (
             <VStack gap={6} align="stretch">
               <Box bg="white" p={8} borderRadius="2xl" boxShadow="2xl">
