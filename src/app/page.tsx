@@ -20,8 +20,9 @@ import { RepoSearchInput } from "@/components/repoInput";
 import { AuthButton } from "@/components/AuthButton";
 
 const toaster = createToaster({
-  placement: "top",
+  placement: "bottom",
   duration: 5000,
+  max: 2,
 });
 
 export default function HomePage() {
@@ -30,27 +31,33 @@ export default function HomePage() {
     owner: string;
     repo: string;
   } | null>(null);
+  const [searchAttempt, setSearchAttempt] = useState(0);
 
   const { data, isLoading, error } = trpc.github.getCompleteAnalysis.useQuery(
     searchParams!,
     {
       enabled: searchParams !== null,
+      retry: false,
+      staleTime: 0,
     }
   );
 
-  // Show toast for  errors
   useEffect(() => {
-    if (error) {
-      toaster.create({
-        title: "Error",
-        description: error.message,
-        type: "error",
-      });
+    if (error && searchAttempt > 0) {
+      // Use setTimeout to avoid flushSync error
+      setTimeout(() => {
+        toaster.create({
+          title: "Error",
+          description: error.message,
+          type: "error",
+        });
+      }, 0);
     }
-  }, [error]);
+  }, [searchAttempt, error]);
 
   const handleSearch = (owner: string, repo: string) => {
     setSearchParams({ owner, repo });
+    setSearchAttempt((prev) => prev + 1);
   };
 
   return (
