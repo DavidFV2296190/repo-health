@@ -25,7 +25,7 @@ export type Commit = {
 
 export type Contributor = {
   username: string | undefined;
-  avatarUrl: string;
+  avatarUrl: string | undefined;
   contributions: number;
   url: string | undefined;
 };
@@ -48,9 +48,9 @@ export type RateLimitStatus = {
 export type HealthScore = {
   overallScore: number;
   breakdown: {
-    activity: number;
-    maintenance: number;
-    community: number;
-    documentation: number;
+    activityScore: number;
+    maintenanceScore: number;
+    communityScore: number;
+    documentationScore: number;
   };
 };
