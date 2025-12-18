@@ -1,5 +1,12 @@
 import { Octokit } from "@octokit/rest";
 import { cacheService } from "@/lib/redis";
+import {
+  RepoInfo,
+  Commit,
+  Contributor,
+  CommunityHealth,
+  RateLimitStatus,
+} from "../types";
 
 // Create Octokit instance with optional access token
 const createOctokit = (accessToken?: string | null) => {
@@ -20,25 +27,15 @@ export const githubService = {
   /**
    * Get repository basic information
    */
-  async getRepoInfo(owner: string, repo: string, accessToken?: string | null) {
+  async getRepoInfo(
+    owner: string,
+    repo: string,
+    accessToken?: string | null
+  ): Promise<RepoInfo> {
     const cacheKey = `repo:info:${owner}:${repo}${accessToken ? ":auth" : ""}`;
-    const cached = await cacheService.get<
-      | {
-          name: string;
-          owner: string;
-          description: string | null;
-          url: string;
-          stars: number;
-          forks: number;
-          language: string | null;
-          openIssues: number;
-          defaultBranch: string;
-          createdAt: string;
-          updatedAt: string;
-          isPrivate: boolean;
-        }
-      | { error: string }
-    >(cacheKey);
+    const cached = await cacheService.get<RepoInfo | { error: string }>(
+      cacheKey
+    );
 
     // Check for cached errors (404/private)
     if (cached && "error" in cached) {
@@ -111,18 +108,14 @@ export const githubService = {
   /**
    * Get commits from the last 90 days
    */
-  async getCommits(owner: string, repo: string, accessToken?: string | null) {
+  async getCommits(
+    owner: string,
+    repo: string,
+    accessToken?: string | null
+  ): Promise<Commit[]> {
     const octokit = createOctokit(accessToken);
     const cacheKey = `repo:commits:${owner}:${repo}${accessToken ? ":auth" : ""}`;
-    const cached = await cacheService.get<
-      {
-        sha: string;
-        message: string;
-        author: string;
-        date: string;
-        url: string;
-      }[]
-    >(cacheKey);
+    const cached = await cacheService.get<Commit[]>(cacheKey);
     if (cached) return cached;
 
     const ninetyDaysAgo = new Date();
@@ -155,17 +148,10 @@ export const githubService = {
     owner: string,
     repo: string,
     accessToken?: string | null
-  ) {
+  ): Promise<Contributor[]> {
     const octokit = createOctokit(accessToken);
     const cacheKey = `repo:contributors:${owner}:${repo}${accessToken ? ":auth" : ""}`;
-    const cached = await cacheService.get<
-      {
-        username: string | undefined;
-        avatarUrl: string;
-        contributions: number;
-        url: string | undefined;
-      }[]
-    >(cacheKey);
+    const cached = await cacheService.get<Contributor[]>(cacheKey);
     if (cached) return cached;
 
     const { data } = await octokit.rest.repos.listContributors({
@@ -210,16 +196,10 @@ export const githubService = {
     owner: string,
     repo: string,
     accessToken?: string | null
-  ) {
+  ): Promise<CommunityHealth> {
     const octokit = createOctokit(accessToken);
     const cacheKey = `repo:community:${owner}:${repo}${accessToken ? ":auth" : ""}`;
-    const cached = await cacheService.get<{
-      hasReadme: boolean;
-      hasLicense: boolean;
-      hasContributing: boolean;
-      hasCodeOfConduct: boolean;
-      healthPercentage: number;
-    }>(cacheKey);
+    const cached = await cacheService.get<CommunityHealth>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -251,7 +231,7 @@ export const githubService = {
     owner: string,
     repo: string,
     accessToken?: string | null
-  ) {
+  ): Promise<CommunityHealth> {
     const octokit = createOctokit(accessToken);
     const filesToCheck = [
       "README.md",
@@ -284,7 +264,9 @@ export const githubService = {
   /**
    * Get GitHub API rate limit status
    */
-  async getRateLimitStatus(accessToken?: string | null) {
+  async getRateLimitStatus(
+    accessToken?: string | null
+  ): Promise<RateLimitStatus> {
     const octokit = createOctokit(accessToken);
     const { data } = await octokit.rest.rateLimit.get();
     return {
