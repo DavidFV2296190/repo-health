@@ -39,7 +39,7 @@ export function RepoSearchInput({ onSearch, isLoading }: RepoSearchInputProps) {
     <Box as="form" onSubmit={handleSubmit}>
       <VStack gap={4} align="stretch">
         <VStack align="start" gap={2}>
-          <Text fontSize="lg" fontWeight="semibold">
+          <Text fontSize="lg" fontWeight="semibold" color="gray.800">
             Repository to Analyze
           </Text>
           <Text fontSize="sm" color="gray.600">
@@ -54,6 +54,10 @@ export function RepoSearchInput({ onSearch, isLoading }: RepoSearchInputProps) {
             placeholder="facebook/react or https://github.com/facebook/react"
             size="lg"
             disabled={isLoading}
+            color="gray.800"
+            bg="white"
+            borderColor="gray.300"
+            _placeholder={{ color: "gray.400" }}
           />
           <Button
             type="submit"
