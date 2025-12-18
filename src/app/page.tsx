@@ -19,6 +19,7 @@ import { trpc } from "@/trpc/client";
 import { RepoSearchInput } from "@/components/repoInput";
 import { AuthButton } from "@/components/AuthButton";
 import { StatCard } from "@/components/cards/StatCard";
+import { PageHeader } from "@/components/PageHeader";
 
 const toaster = createToaster({
   placement: "bottom",
@@ -53,9 +54,9 @@ export default function HomePage() {
           type: "error",
           action: !session
             ? {
-                label: "Sign in",
-                onClick: () => signIn("github"),
-              }
+              label: "Sign in",
+              onClick: () => signIn("github"),
+            }
             : undefined,
         });
       }, 0);
@@ -69,30 +70,13 @@ export default function HomePage() {
 
   return (
     <Box
-      bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      bg="#0d1117"
       minH="100vh"
       py={12}
     >
       <Container maxW="container.xl">
         <VStack gap={10} align="stretch">
-          <Box textAlign="center" py={8}>
-            <HStack justify="flex-end" mb={4}>
-              <AuthButton />
-            </HStack>
-            <Heading
-              size="6xl"
-              mb={4}
-              bgGradient="to-r"
-              gradientFrom="white"
-              gradientTo="gray.200"
-              bgClip="text"
-            >
-              Repository Health Analyzer
-            </Heading>
-            <Text fontSize="xl" color="white" opacity={0.9}>
-              Analyze the health and activity of any GitHub repository
-            </Text>
-          </Box>
+          <PageHeader />
 
           <Box bg="white" p={8} borderRadius="2xl" boxShadow="2xl">
             <RepoSearchInput onSearch={handleSearch} isLoading={isLoading} />
