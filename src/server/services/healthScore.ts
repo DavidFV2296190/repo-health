@@ -1,4 +1,5 @@
 import { githubService } from "./githubService";
+import { cacheService } from "@/lib/redis";
 import { HealthScore } from "../types";
 import {
   calculateActivityScore,
@@ -8,11 +9,19 @@ import {
   WEIGHTS,
 } from "./calculations";
 
+const CACHE_TTL = 3600; // 1 hour
+
 export async function calculateHealthScore(
   owner: string,
   repo: string,
   accessToken?: string | null
 ): Promise<HealthScore> {
+  // Check cache first
+  const cacheKey = `health-score:${owner}:${repo}${accessToken ? ":auth" : ""}`;
+  const cached = await cacheService.get<HealthScore>(cacheKey);
+  if (cached) {
+    return cached;
+  }
   const [repoInfo, commits, contributors, community] = await Promise.all([
     githubService.getRepoInfo(owner, repo, accessToken),
     githubService.getCommits(owner, repo, accessToken),
@@ -42,5 +51,6 @@ export async function calculateHealthScore(
     },
   };
 
+  await cacheService.set(cacheKey, result, CACHE_TTL);
   return result;
 }
