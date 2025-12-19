@@ -15,7 +15,6 @@ Based on this problem, I decided to go this way:
 - **Time Estimations** - How long will it take to set up and build?
 - **Community Reports** - Is this a welcoming community or toxic environment?
 
-See [ROADMAP.md](./ROADMAP.md) for the full implementation plan.
 
 ---
 
@@ -57,7 +56,8 @@ src/
 │       ├── StatCard.tsx
 │       ├── CommitListCard.tsx
 │       ├── ContributorCard.tsx
-│       └── LanguageCard.tsx
+│       ├── LanguageCard.tsx
+│       └── HealthScoreCircle.tsx
 │
 ├── trpc/                   # tRPC configuration
 │   ├── init.ts            # tRPC initialization and context
@@ -67,8 +67,12 @@ src/
 ├── server/                 # Backend logic
 │   ├── routers/
 │   │   └── githubRouter.ts    # GitHub API endpoints
-│   └── services/
-│       └── githubService.ts   # GitHub API calls and caching
+│   ├── services/
+│   │   ├── githubService.ts   # GitHub API calls and caching
+│   │   ├── healthScore.ts     # Health score calculation orchestration
+│   │   └── calculations.ts    # Score calculation algorithms
+│   └── types/
+│       └── index.ts           # Shared TypeScript types
 │
 └── lib/                    # Shared utilities
     ├── prisma.ts          # Prisma client
@@ -111,7 +115,7 @@ src/
 
 ### Request Flow
 
-That is how I am seeing the request flow how it works
+That is how the request flow  works
 
 ```
 User Input -> Frontend Validation -> tRPC Client -> tRPC Router -> Input Validation (Zod) -> GitHub Service -> Check Redis Cache -> Cache Miss → GitHub API Call -> Store in Cache -> Save Metadata -> MySQL (Prisma) ->
@@ -133,9 +137,9 @@ Return Data -> Frontend -> Display Cards
 - GitHub OAuth authentication
 - Component extraction for maintainability
 
-### Phase 2: Core Analysis (Next)
+### Phase 2: Core Analysis (~30% Complete)
 
-- Health Score Algorithm (0-100 weighted score)
+- Health Score Algorithm (0-100 weighted score) _80% done, needs tests_
 - Dependency Analysis (package.json, requirements.txt, go.mod, CMakeLists.txt)
 - Setup Time Estimation
 - Build Time Estimation (compiled languages)
@@ -157,15 +161,18 @@ Return Data -> Frontend -> Display Cards
 - Repository search for public GitHub repos
 - Private repository access with GitHub OAuth
 - Key metrics: stars, forks, commits (90 days), open issues
+- **Health Score (0-100)** with breakdown:
+  - Activity Score (commit frequency, recency, unique authors)
+  - Maintenance Score (issue ratio, project age, updates)
+  - Community Score (stars, forks, contributors)
+  - Documentation Score (README, LICENSE, CONTRIBUTING, Code of Conduct)
 - Top contributors list
 - Language breakdown
 - Recent commit activity
-- Redis caching for fast repeated queries
+- Redis caching for fast repeated queries (1 hour TTL)
 - GitHub dark theme UI
 
 ## Planned Features
-
-See [ROADMAP.md](./ROADMAP.md) for detailed implementation plan.
 
 - Health Score (0-100)
 - Dependency complexity analysis
