@@ -6,7 +6,6 @@ import type {
   Vulnerability,
 } from "../types";
 
-const OSV_API = "https://api.osv.dev/v1/querybatch";
 const CACHE_TTL = {
   OSV: 7 * 24 * 60 * 60,
 };
@@ -15,11 +14,27 @@ function cleanVersion(version: string): string {
   return version.replace(/^[\^~>=<]/, "").split(" ")[0];
 }
 
-function mapSeverity(raw: string): Vulnerability["severity"] {
-  const s = raw?.toUpperCase() || "";
-  if (s.includes("CRITICAL")) return "CRITICAL";
-  if (s.includes("HIGH")) return "HIGH";
-  if (s.includes("MEDIUM") || s.includes("MODERATE")) return "MEDIUM";
+function mapSeverity(raw: any): Vulnerability["severity"] {
+  const dbSeverity = raw?.database_specific?.severity?.toUpperCase() || "";
+  if (dbSeverity === "CRITICAL") return "CRITICAL";
+  if (dbSeverity === "HIGH") return "HIGH";
+  if (dbSeverity === "MODERATE" || dbSeverity === "MEDIUM") return "MEDIUM";
+  if (dbSeverity === "LOW") return "LOW";
+
+  const cvssScore = raw?.severity?.[0]?.score;
+  if (cvssScore !== undefined) {
+    if (cvssScore >= 9.0) return "CRITICAL";
+    if (cvssScore >= 7.0) return "HIGH";
+    if (cvssScore >= 4.0) return "MEDIUM";
+    return "LOW";
+  }
+
+  const severityType = raw?.severity?.[0]?.type?.toUpperCase() || "";
+  if (severityType.includes("CRITICAL")) return "CRITICAL";
+  if (severityType.includes("HIGH")) return "HIGH";
+  if (severityType.includes("MEDIUM") || severityType.includes("MODERATE"))
+    return "MEDIUM";
+
   return "LOW";
 }
 
@@ -74,29 +89,37 @@ function extractDeps(packageJson: any, key: string) {
 function parseOSVVuln(raw: any): Vulnerability {
   return {
     id: raw.id,
-    severity: mapSeverity(
-      raw.database_specific?.severity || raw.severity?.[0]?.type
-    ),
-    summary: raw.summary || "No description",
+    severity: mapSeverity(raw),
+    summary: raw.summary || raw.details || "No description",
     fixedVersion: raw.affected?.[0]?.ranges?.[0]?.events?.find(
       (e: any) => e.fixed
     )?.fixed,
   };
 }
 
-async function fetchFromOSV(deps: { name: string; version: string }[]) {
-  const response = await fetch(OSV_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      queries: deps.map((d) => ({
-        package: { name: d.name, ecosystem: "npm" },
-        version: d.version,
-      })),
-    }),
-  });
-  if (!response.ok) return [];
-  return (await response.json()).results || [];
+// Use single query API to get full vulnerability details
+async function fetchVulnsFromOSV(
+  name: string,
+  version: string
+): Promise<Vulnerability[]> {
+  try {
+    const response = await fetch("https://api.osv.dev/v1/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        package: { name, ecosystem: "npm" },
+        version,
+      }),
+    });
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    const vulns = (data.vulns || []).map(parseOSVVuln);
+    return vulns;
+  } catch {
+    return [];
+  }
 }
 
 async function getVulnsForDep(
@@ -106,8 +129,8 @@ async function getVulnsForDep(
   const cacheKey = `osv:${name}:${version}`;
   const cached = await cacheService.get<Vulnerability[]>(cacheKey);
   if (cached) return cached;
-  const results = await fetchFromOSV([{ name, version }]);
-  const vulns = (results[0]?.vulns || []).map(parseOSVVuln);
+
+  const vulns = await fetchVulnsFromOSV(name, version);
   await cacheService.set(cacheKey, vulns, CACHE_TTL.OSV);
   return vulns;
 }
