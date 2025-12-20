@@ -1,5 +1,7 @@
 // GitHub API response types used across services
 
+import { NumberInputLabelProps } from "@chakra-ui/react";
+
 export type RepoInfo = {
   name: string;
   owner: string;
@@ -98,3 +100,76 @@ export type IssueCheckResult = {
 };
 
 export type Ecosystem = "npm" | "PyPI" | "Go" | "crates.io" | "Conan" | "NuGet";
+
+export type HotPR = {
+  id: number;
+  title: string;
+  url: string;
+  author: string;
+  comments: number;
+  reviewComments: number;
+  reviewers: number;
+  createdAt: string;
+};
+
+export type AuthorBreakdown = {
+  maintainer: number;
+  community: number;
+  bots: number;
+};
+
+export type ConversationStats = {
+  avgComments: number;
+  totalComments: number;
+};
+
+export type PRStats = {
+  total: number;
+  open: number;
+  closed: number;
+  merged: number;
+  avgMergeTimeHours: number;
+  medianMergeTimeHours: number;
+  authorBreakdown: AuthorBreakdown;
+  conversationStats: ConversationStats;
+  aiReviewers: string[];
+  hasTemplate: boolean;
+  templatePath: string | null;
+  hotPRs: HotPR[];
+  contributorFunnel?: ContributorFunnel;
+  aiInteractionStats?: AIInteractionStats;
+};
+
+export type ResponseTimeCell = {
+  day: string;
+  hour: number;
+  avgResponseHours: number;
+  count: number;
+};
+
+export type ResponseTimeHeatmap = {
+  cells: ResponseTimeCell[];
+  fastThreshold: number; // hours - below this is green
+  slowThreshold: number; // hours - above this is red
+};
+
+export type ContributorFunnel = {
+  firstTime: number; // Contributors with 1 PR
+  secondContribution: number; // Contributors with 2 PRs
+  regular: number; // Contributors with 3-9 PRs
+  coreTeam: number; // Contributors with 10+ PRs or maintainer status
+};
+
+// AI Bot Interaction Analytics
+export type AIBotStats = {
+  name: string;
+  commentCount: number;
+  prsReviewedCount: number;
+};
+
+export type AIInteractionStats = {
+  totalAIComments: number;
+  avgWrestlingTimeHours: number; // Time from AI comment to next human commit
+  prsWithAIReviews: number;
+  bots: AIBotStats[];
+};
