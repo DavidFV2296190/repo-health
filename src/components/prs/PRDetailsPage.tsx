@@ -1,0 +1,423 @@
+"use client";
+
+import {
+  Box,
+  Grid,
+  Text,
+  VStack,
+  HStack,
+  Badge,
+  Flex,
+  Link as ChakraLink,
+} from "@chakra-ui/react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
+import {
+  FaCodeBranch,
+  FaClock,
+  FaComments,
+  FaRobot,
+  FaFileAlt,
+  FaFire,
+  FaUsers,
+  FaExternalLinkAlt,
+} from "react-icons/fa";
+import type { PRStats } from "@/server/types";
+import { ContributorSankey } from "./ContributorSankey";
+import { AIInteractionCard } from "./AIInteractionCard";
+
+const COLORS = {
+  merged: "#238636",
+  open: "#58a6ff",
+  closed: "#8b949e",
+  maintainer: "#58a6ff",
+  community: "#238636",
+  bots: "#a371f7",
+};
+function StatCard({
+  icon,
+  label,
+  value,
+  subtext,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  subtext?: string;
+}) {
+  return (
+    <Box
+      bg="#161b22"
+      border="1px solid #30363d"
+      borderRadius="lg"
+      p={5}
+      transition="all 0.2s"
+      _hover={{ borderColor: "#58a6ff" }}
+    >
+      <HStack gap={3} mb={2}>
+        <Box color="#58a6ff">{icon}</Box>
+        <Text color="#8b949e" fontSize="sm">
+          {label}
+        </Text>
+      </HStack>
+      <Text color="#c9d1d9" fontSize="2xl" fontWeight="bold">
+        {value}
+      </Text>
+      {subtext && (
+        <Text color="#6e7681" fontSize="xs" mt={1}>
+          {subtext}
+        </Text>
+      )}
+    </Box>
+  );
+}
+
+function ChartCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={5}>
+      <Text color="#c9d1d9" fontWeight="bold" mb={4}>
+        {title}
+      </Text>
+      {children}
+    </Box>
+  );
+}
+
+function ChartLegend({
+  items,
+}: {
+  items: { name: string; value: number; color: string }[];
+}) {
+  return (
+    <HStack justify="center" gap={4} mt={4} flexWrap="wrap">
+      {items.map((item) => (
+        <HStack key={item.name} gap={1}>
+          <Box w="10px" h="10px" borderRadius="full" bg={item.color} />
+          <Text color="#8b949e" fontSize="xs">
+            {item.name}: {item.value}
+          </Text>
+        </HStack>
+      ))}
+    </HStack>
+  );
+}
+
+type Props = {
+  stats: PRStats;
+  owner: string;
+  repo: string;
+};
+
+export function PRDetailsPage({ stats, owner, repo }: Props) {
+  const statusData = [
+    { name: "Merged", value: stats.merged, color: COLORS.merged },
+    { name: "Open", value: stats.open, color: COLORS.open },
+    {
+      name: "Closed",
+      value: stats.closed - stats.merged,
+      color: COLORS.closed,
+    },
+  ];
+
+  const authorData = [
+    {
+      name: "Maintainer",
+      value: stats.authorBreakdown.maintainer,
+      color: COLORS.maintainer,
+    },
+    {
+      name: "Community",
+      value: stats.authorBreakdown.community,
+      color: COLORS.community,
+    },
+    { name: "Bots", value: stats.authorBreakdown.bots, color: COLORS.bots },
+  ];
+
+  const mergeTimeData = [
+    {
+      name: "Average",
+      hours: stats.avgMergeTimeHours,
+      days: Math.round(stats.avgMergeTimeHours / 24),
+    },
+    {
+      name: "Median",
+      hours: stats.medianMergeTimeHours,
+      days: Math.round(stats.medianMergeTimeHours / 24),
+    },
+  ];
+
+  const formatHours = (hours: number) => {
+    if (hours < 24) return `${hours}h`;
+    return `${Math.round(hours / 24)}d`;
+  };
+
+  return (
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        mb={8}
+        flexWrap="wrap"
+        gap={4}
+      >
+        <HStack gap={3}>
+          <FaCodeBranch size={28} color="#58a6ff" />
+          <VStack align="start" gap={0}>
+            <Text fontSize="2xl" fontWeight="bold" color="#c9d1d9">
+              Pull Request Analytics
+            </Text>
+            <Text fontSize="sm" color="#8b949e">
+              {owner}/{repo}
+            </Text>
+          </VStack>
+        </HStack>
+        <ChakraLink
+          href={`https://github.com/${owner}/${repo}/pulls`}
+          target="_blank"
+          color="#58a6ff"
+          fontSize="sm"
+          display="flex"
+          alignItems="center"
+          gap={2}
+        >
+          View on GitHub <FaExternalLinkAlt size={12} />
+        </ChakraLink>
+      </Flex>
+
+      <Grid
+        templateColumns={{
+          base: "1fr",
+          sm: "repeat(2, 1fr)",
+          lg: "repeat(4, 1fr)",
+        }}
+        gap={4}
+        mb={8}
+      >
+        <StatCard
+          icon={<FaCodeBranch size={18} />}
+          label="Total PRs"
+          value={stats.total}
+          subtext={`${stats.open} open, ${stats.merged} merged`}
+        />
+        <StatCard
+          icon={<FaClock size={18} />}
+          label="Avg Merge Time"
+          value={formatHours(stats.avgMergeTimeHours)}
+          subtext={`Median: ${formatHours(stats.medianMergeTimeHours)}`}
+        />
+        <StatCard
+          icon={<FaComments size={18} />}
+          label="Avg Comments/PR"
+          value={stats.conversationStats.avgComments}
+          subtext={`${stats.conversationStats.totalComments} total comments`}
+        />
+        <StatCard
+          icon={<FaRobot size={18} />}
+          label="AI Reviews (Community)"
+          value={stats.aiInteractionStats?.totalAIComments || 0}
+          subtext={
+            stats.aiInteractionStats?.prsWithAIReviews
+              ? `${stats.aiInteractionStats.prsWithAIReviews} PRs reviewed by bots`
+              : "No AI reviews on community PRs"
+          }
+        />
+      </Grid>
+
+      <Grid
+        templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
+        gap={6}
+        mb={8}
+      >
+        <ChartCard title="PR Status Distribution">
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {statusData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: "#161b22",
+                  border: "1px solid #30363d",
+                }}
+                labelStyle={{ color: "#c9d1d9" }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <ChartLegend items={statusData} />
+        </ChartCard>
+        <ChartCard title="Who Creates PRs?">
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie
+                data={authorData}
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {authorData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: "#161b22",
+                  border: "1px solid #30363d",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <ChartLegend items={authorData} />
+        </ChartCard>
+      </Grid>
+
+      <ChartCard title="Time to Merge">
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={mergeTimeData} layout="vertical">
+            <XAxis type="number" stroke="#6e7681" fontSize={12} />
+            <YAxis
+              type="category"
+              dataKey="name"
+              stroke="#6e7681"
+              fontSize={12}
+              width={60}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "#161b22",
+                border: "1px solid #30363d",
+              }}
+              formatter={(value) => {
+                if (value === undefined) return ["N/A"];
+                return [
+                  `${value} hours (${Math.round(Number(value) / 24)} days)`,
+                ];
+              }}
+            />
+            <Bar dataKey="hours" fill="#58a6ff" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+        <Text color="#6e7681" fontSize="xs" mt={3}>
+          📊 Calculated from {stats.merged} merged PRs. Measures time from PR
+          creation to merge.
+          {stats.merged === 0 && " No merged PRs yet to calculate merge time."}
+        </Text>
+      </ChartCard>
+
+      {/* AI Interaction Stats */}
+      {stats.aiInteractionStats && (
+        <Box mt={6}>
+          <AIInteractionCard stats={stats.aiInteractionStats} />
+        </Box>
+      )}
+
+      {stats.hotPRs.length > 0 && (
+        <Box
+          bg="#161b22"
+          border="1px solid #30363d"
+          borderRadius="lg"
+          p={5}
+          mt={6}
+        >
+          <HStack gap={2} mb={4}>
+            <FaFire color="#f85149" />
+            <Text color="#c9d1d9" fontWeight="bold">
+              Most Active PRs
+            </Text>
+          </HStack>
+          <VStack align="stretch" gap={2}>
+            {stats.hotPRs.map((pr) => (
+              <ChakraLink
+                key={pr.id}
+                href={pr.url}
+                target="_blank"
+                _hover={{ textDecoration: "none" }}
+              >
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  p={3}
+                  bg="#0d1117"
+                  borderRadius="md"
+                  transition="all 0.2s"
+                  _hover={{ bg: "#21262d" }}
+                >
+                  <HStack flex={1} minW={0}>
+                    <Text color="#58a6ff" fontWeight="medium" flexShrink={0}>
+                      #{pr.id}
+                    </Text>
+                    <Text color="#c9d1d9" fontSize="sm" lineClamp={1}>
+                      {pr.title}
+                    </Text>
+                  </HStack>
+                  <HStack gap={2} flexShrink={0} ml={2}>
+                    <Badge bg="#30363d" color="#8b949e">
+                      {pr.comments + pr.reviewComments} 💬
+                    </Badge>
+                    <Text color="#6e7681" fontSize="xs">
+                      by {pr.author}
+                    </Text>
+                  </HStack>
+                </Flex>
+              </ChakraLink>
+            ))}
+          </VStack>
+        </Box>
+      )}
+
+      {/* Contributor Journey Sankey */}
+      {stats.contributorFunnel && (
+        <Box mt={6}>
+          <ContributorSankey funnel={stats.contributorFunnel} />
+        </Box>
+      )}
+
+      {stats.hasTemplate && stats.templatePath && (
+        <Box
+          bg="#161b22"
+          border="1px solid #30363d"
+          borderRadius="lg"
+          p={5}
+          mt={6}
+        >
+          <HStack gap={3}>
+            <FaFileAlt color="#238636" size={18} />
+            <Text color="#c9d1d9">This repo has a PR template:</Text>
+            <ChakraLink
+              href={`https://github.com/${owner}/${repo}/blob/main/${stats.templatePath}`}
+              target="_blank"
+              color="#58a6ff"
+              _hover={{ textDecoration: "underline" }}
+            >
+              {stats.templatePath} →
+            </ChakraLink>
+          </HStack>
+        </Box>
+      )}
+    </Box>
+  );
+}
