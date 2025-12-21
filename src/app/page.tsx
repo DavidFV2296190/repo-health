@@ -25,6 +25,7 @@ import { LanguageCard } from "@/components/cards/LanguageCard";
 import { HealthScoreCircle } from "@/components/cards/HealthScoreCircle";
 import { DependencySummaryCard } from "@/components/cards/DependencySummaryCard";
 import { PRStatsCard } from "@/components/cards/PRStatsCard";
+import { IssueStatsCard } from "@/components/cards/IssueStatsCard";
 
 const toaster = createToaster({
   placement: "bottom",
@@ -208,7 +209,7 @@ export default function HomePage() {
                   <Text color="#8b949e">Scanning dependencies...</Text>
                 </Box>
               ) : (
-                <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+                <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
                   {dependencies && searchParams && (
                     <DependencySummaryCard
                       summary={dependencies.summary}
@@ -219,6 +220,13 @@ export default function HomePage() {
                   {prStats && searchParams && (
                     <PRStatsCard
                       stats={prStats}
+                      owner={searchParams.owner}
+                      repo={searchParams.repo}
+                    />
+                  )}
+                  {searchParams && (
+                    <IssueStatsCard
+                      openIssues={data.repository.openIssues || 0}
                       owner={searchParams.owner}
                       repo={searchParams.repo}
                     />
