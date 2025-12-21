@@ -153,10 +153,16 @@ export default function DependencyDashboard() {
           {/* Header */}
           <Box>
             <Text fontSize="3xl" fontWeight="bold" color="#c9d1d9">
-              Dependency Analysis
+              Dependency Security
             </Text>
-            <Text fontSize="lg" color="#8b949e">
+            <Text fontSize="lg" color="#8b949e" mb={2}>
               {owner}/{repo}
+            </Text>
+            <Text fontSize="md" color="#6e7681" maxW="700px">
+              View security vulnerabilities in your dependencies with
+              recommended fixes, official documentation, and related pull
+              requests from across GitHub. No existing issue? Create one to
+              notify maintainers.
             </Text>
           </Box>
 
@@ -202,10 +208,11 @@ export default function DependencyDashboard() {
                 <FaExclamationTriangle color="#f85149" size={20} />
                 <VStack align="start" gap={0}>
                   <Text color="#f85149" fontWeight="bold">
-                    Vulnerabilities Detected
+                    Action Required
                   </Text>
                   <Text color="#8b949e" fontSize="sm">
-                    Click on a row to see solution links and related PRs.
+                    Select a vulnerability to view fixes, documentation, and
+                    community PRs. Create an issue if none exists.
                   </Text>
                 </VStack>
               </HStack>
