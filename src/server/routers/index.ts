@@ -6,6 +6,7 @@ import { prRouter } from "./prRouter";
 import { userRouter } from "./userRouter";
 import { issueRouter } from "./issueRouter";
 import { securityRouter } from "./securityRouter";
+import { anomalyRouter } from "./anomalyRouter";
 
 export const appRouter = router({
   repo: repoRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   user: userRouter,
   issue: issueRouter,
   security: securityRouter,
+  anomaly: anomalyRouter,
 });
 
 export type AppRouter = typeof appRouter;
