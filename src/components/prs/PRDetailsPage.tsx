@@ -31,7 +31,10 @@ import {
   FaFire,
   FaUsers,
   FaExternalLinkAlt,
+  FaArrowLeft,
 } from "react-icons/fa";
+import Link from "next/link";
+import { Button } from "@chakra-ui/react";
 import type { PRStats } from "@/server/types";
 import { ContributorSankey } from "./ContributorSankey";
 import { AIInteractionCard } from "./AIInteractionCard";
@@ -169,6 +172,16 @@ export function PRDetailsPage({ stats, owner, repo }: Props) {
 
   return (
     <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
+      <Link href="/" style={{ width: "fit-content" }}>
+        <Button
+          variant="ghost"
+          color="#8b949e"
+          _hover={{ color: "#c9d1d9", bg: "#21262d" }}
+        >
+          <FaArrowLeft />
+          <Text ml={2}>Back to Analysis</Text>
+        </Button>
+      </Link>
       <Flex
         justify="space-between"
         align="center"

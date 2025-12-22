@@ -11,7 +11,9 @@ import {
   Spinner,
   Flex,
 } from "@chakra-ui/react";
-import { FaShieldAlt, FaCheckCircle } from "react-icons/fa";
+import { FaShieldAlt, FaCheckCircle, FaArrowLeft } from "react-icons/fa";
+import Link from "next/link";
+import { Button } from "@chakra-ui/react";
 import { trpc } from "@/trpc/client";
 
 const SEVERITY_COLORS: Record<string, { bg: string; color: string }> = {
@@ -65,6 +67,16 @@ export default function SecurityPage() {
 
   return (
     <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
+      <Link href="/" style={{ width: "fit-content" }}>
+        <Button
+          variant="ghost"
+          color="#8b949e"
+          _hover={{ color: "#c9d1d9", bg: "#21262d" }}
+        >
+          <FaArrowLeft />
+          <Text ml={2}>Back to Analysis</Text>
+        </Button>
+      </Link>
       {/* Header */}
       <Flex
         justify="space-between"
