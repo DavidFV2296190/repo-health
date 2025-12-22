@@ -26,6 +26,7 @@ import { HealthScoreCircle } from "@/components/cards/HealthScoreCircle";
 import { DependencySummaryCard } from "@/components/cards/DependencySummaryCard";
 import { PRStatsCard } from "@/components/cards/PRStatsCard";
 import { IssueStatsCard } from "@/components/cards/IssueStatsCard";
+import { SecurityCard } from "@/components/cards/SecurityCard";
 
 const toaster = createToaster({
   placement: "bottom",
@@ -227,6 +228,12 @@ export default function HomePage() {
                   {searchParams && (
                     <IssueStatsCard
                       openIssues={data.repository.openIssues || 0}
+                      owner={searchParams.owner}
+                      repo={searchParams.repo}
+                    />
+                  )}
+                  {searchParams && (
+                    <SecurityCard
                       owner={searchParams.owner}
                       repo={searchParams.repo}
                     />
