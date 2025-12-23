@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, HStack } from "@chakra-ui/react";
 
 interface StatCardProps {
   label: string;
@@ -9,42 +9,22 @@ interface StatCardProps {
 export function StatCard({ label, value, icon }: StatCardProps) {
   return (
     <Box
-      bg="#000000"
-      border="1px solid #333333"
-      p={6}
+      bg="#161b22"
+      border="1px solid #30363d"
+      p={4}
       borderRadius="lg"
-      boxShadow="0 4px 6px rgba(0, 0, 0, 0.3)"
       transition="all 0.2s"
       _hover={{
-        transform: "translateY(-2px)",
-        borderColor: "#666666",
-        boxShadow: "0 8px 12px rgba(0, 0, 0, 0.4)",
+        borderColor: "#58a6ff",
       }}
     >
-      {/* Icon */}
-      <Text fontSize="2xl" mb={3}>
-        {icon}
-      </Text>
-
-      {/* Big number */}
-      <Text
-        fontSize="4xl"
-        fontWeight="bold"
-        color="#FFFFFF"
-        mb={2}
-        letterSpacing="tight"
-      >
-        {value}
-      </Text>
-
-      {/* Label */}
-      <Text
-        fontSize="xs"
-        color="#999999"
-        textTransform="uppercase"
-        fontWeight="semibold"
-        letterSpacing="wide"
-      >
+      <HStack justify="space-between" align="center">
+        <Text fontSize="lg">{icon}</Text>
+        <Text fontSize="2xl" fontWeight="bold" color="#c9d1d9">
+          {value}
+        </Text>
+      </HStack>
+      <Text fontSize="xs" color="#8b949e" textTransform="uppercase" mt={1}>
         {label}
       </Text>
     </Box>
