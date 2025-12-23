@@ -9,6 +9,7 @@ A tool for analyzing GitHub repository health, identifying vulnerable dependenci
 - **PR Analytics** - Merge times, author breakdown, AI reviewer detection
 - **Issue Analytics** - Crackability scores, hidden gems, hot issues
 - **Security Scanner** - Detect exposed secrets with 22 patterns + entropy analysis
+- **Activity Monitor** - Anomaly detection for commit patterns using Z-score analysis
 - **Contributor Journey** - Visualize first-time → returning → core contributor flow
 - **Related PRs** - Find community fixes for vulnerabilities
 - **GitHub OAuth** - Access private repositories
@@ -107,6 +108,7 @@ Analyze pull request patterns and community contributor behavior.
 - [x] **Search History** - Save searches for logged-in users, autocomplete with Fuse.js
 - [x] **Issue Analytics** - Crackability scores, hidden gems, hot issues
 - [x] **Security Scanner** - Detect exposed secrets with 22 regex patterns + entropy analysis
+- [x] **Activity Monitor** - Anomaly detection using Z-score analysis, burst detection, churn analysis
 
 ### In Progress (~15%)
 
@@ -222,6 +224,66 @@ Score = 100 - Σ(severityPenalty)
 | C     | 60-74  | Needs attention    |
 | D     | 40-59  | Significant issues |
 | F     | 0-39   | Critical problems  |
+
+---
+
+## Activity Monitor
+
+Detect suspicious commit patterns using statistical anomaly detection.
+
+### Detection Methods
+
+| Method            | Description                      | Threshold        |
+| ----------------- | -------------------------------- | ---------------- |
+| Z-Score Analysis  | Statistical outlier detection    | \|Z\| > 2.5      |
+| Sensitive Files   | .env, .pem, secrets, credentials | Pattern match    |
+| Off-Hours Commits | Activity between 12am-6am        | Time check       |
+| Burst Detection   | Many commits in short window     | 5+ in 10 minutes |
+| Churn Analysis    | High deletion ratio per commit   | >80% deletions   |
+
+### Z-Score Formula
+
+```
+Z = (value - mean) / standardDeviation
+```
+
+| Z-Score | Interpretation     |
+| ------- | ------------------ |
+| < 2.0   | Normal             |
+| 2.0-3.0 | Unusual (warning)  |
+| > 3.0   | Anomaly (critical) |
+
+### Anomaly Types
+
+| Type     | Severity | Example                            |
+| -------- | -------- | ---------------------------------- |
+| Churn    | Critical | Deleted 90% of code (12,453 lines) |
+| File     | Critical | .env.production modified           |
+| Velocity | Warning  | 23 commits in 1 hour               |
+| Time     | Warning  | Commit at 3:42 AM                  |
+| Pattern  | Info     | 40% weekend activity               |
+
+### Risk Score Calculation
+
+```
+Score = Σ(severityWeight × eventCount)
+```
+
+| Severity | Weight |
+| -------- | ------ |
+| Critical | +20    |
+| Warning  | +8     |
+| Info     | +2     |
+
+### Risk Grades
+
+| Grade | Score  | Meaning            |
+| ----- | ------ | ------------------ |
+| A     | 0-10   | Normal activity    |
+| B     | 11-30  | Minor anomalies    |
+| C     | 31-50  | Review recommended |
+| D     | 51-70  | Suspicious         |
+| F     | 71-100 | Critical review    |
 
 ---
 
