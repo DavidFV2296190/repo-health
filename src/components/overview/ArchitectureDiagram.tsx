@@ -1,0 +1,360 @@
+"use client";
+
+import { useEffect, useRef, useState, useMemo } from "react";
+import { Box, Text, VStack, Input, HStack, Badge } from "@chakra-ui/react";
+import { FaSearch } from "react-icons/fa";
+import * as d3 from "d3";
+
+interface FileNode {
+  path: string;
+  type: "blob" | "tree";
+  size?: number;
+}
+
+interface HierarchyNode {
+  name: string;
+  path?: string;
+  children?: HierarchyNode[];
+  value?: number;
+}
+
+type Props = {
+  fileTree: FileNode[];
+  owner: string;
+  repo: string;
+};
+
+function buildHierarchy(
+  files: FileNode[],
+  repoName: string,
+  maxDepth = 3
+): HierarchyNode {
+  const root: HierarchyNode = { name: repoName, path: "", children: [] };
+
+  // Limit files to avoid overcrowding
+  const limitedFiles = files.slice(0, 100);
+
+  limitedFiles.forEach((file) => {
+    const parts = file.path.split("/");
+    let current = root;
+    let currentPath = "";
+
+    // Limit depth
+    const limitedParts = parts.slice(0, maxDepth + 1);
+
+    limitedParts.forEach((part, index) => {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      const isFile = index === limitedParts.length - 1 && file.type === "blob";
+      let child = current.children?.find((c) => c.name === part);
+
+      if (!child) {
+        child = {
+          name: part,
+          path: currentPath,
+          ...(isFile ? { value: file.size || 100 } : { children: [] }),
+        };
+        current.children = current.children || [];
+        current.children.push(child);
+      }
+
+      if (!isFile) {
+        current = child;
+      }
+    });
+  });
+
+  return root;
+}
+
+const FOLDER_COLORS: Record<string, string> = {
+  src: "#58a6ff",
+  app: "#a371f7",
+  components: "#f778ba",
+  server: "#7ee787",
+  lib: "#ffa657",
+  utils: "#ffc107",
+  hooks: "#ff6b6b",
+  types: "#79c0ff",
+  api: "#7ee787",
+  pages: "#a371f7",
+  prisma: "#5a67d8",
+  packages: "#58a6ff",
+  routers: "#7ee787",
+  services: "#7ee787",
+};
+
+export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
+
+  // Filter files for search suggestions
+  const searchResults = useMemo(() => {
+    if (!searchQuery || searchQuery.length < 2) return [];
+    const query = searchQuery.toLowerCase();
+    return fileTree
+      .filter((f) => f.path.toLowerCase().includes(query))
+      .slice(0, 8);
+  }, [fileTree, searchQuery]);
+
+  useEffect(() => {
+    if (!svgRef.current || !containerRef.current || fileTree.length === 0)
+      return;
+
+    const width = Math.max(containerRef.current.clientWidth, 1200);
+    const hierarchyData = buildHierarchy(fileTree, repo);
+    const root = d3.hierarchy(hierarchyData);
+
+    const nodeCount = root.descendants().length;
+    const height = Math.max(600, nodeCount * 25);
+    const treeLayout = d3
+      .tree<HierarchyNode>()
+      .size([height - 40, width - 250]);
+    const treeRoot = treeLayout(root);
+
+    d3.select(svgRef.current).selectAll("*").remove();
+
+    const svg = d3
+      .select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", `0 0 ${width} ${height}`);
+
+    const g = svg.append("g").attr("transform", "translate(100, 20)");
+
+    g.selectAll(".link")
+      .data(treeRoot.links())
+      .join("path")
+      .attr("class", "link")
+      .attr("fill", "none")
+      .attr("stroke", "#30363d")
+      .attr("stroke-width", 1.5)
+      .attr(
+        "d",
+        d3
+          .linkHorizontal<
+            d3.HierarchyPointLink<HierarchyNode>,
+            d3.HierarchyPointNode<HierarchyNode>
+          >()
+          .x((d) => d.y)
+          .y((d) => d.x)
+      );
+
+    const nodes = g
+      .selectAll(".node")
+      .data(treeRoot.descendants()) // Include root node (project name)
+      .join("g")
+      .attr("class", "node")
+      .attr("transform", (d) => `translate(${d.y},${d.x})`);
+
+    nodes
+      .append("rect")
+      .attr("x", -8)
+      .attr("y", -10)
+      .attr("width", (d) => {
+        const textLen = d.data.name.length * 7 + 30;
+        return Math.min(textLen, 180);
+      })
+      .attr("height", 20)
+      .attr("rx", 4)
+      .attr("fill", (d) => {
+        const isHighlighted = highlightedPath === d.data.path;
+        if (isHighlighted) return "#ffc107";
+        const color =
+          FOLDER_COLORS[d.data.name] || (d.children ? "#30363d" : "#21262d");
+        return color + (d.children ? "44" : "88");
+      })
+      .attr("stroke", (d) => {
+        const isHighlighted = highlightedPath === d.data.path;
+        if (isHighlighted) return "#ffc107";
+        return (
+          FOLDER_COLORS[d.data.name] || (d.children ? "#8b949e" : "#58a6ff")
+        );
+      })
+      .attr("stroke-width", (d) => (highlightedPath === d.data.path ? 2 : 1))
+      .style("cursor", "pointer")
+      .on("click", (_, d) => {
+        if (!d.children && d.data.path) {
+          window.open(
+            `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
+            "_blank"
+          );
+        }
+      });
+
+    // Icons using SVG symbols instead of emojis (fixes hydration error)
+    nodes
+      .append("rect")
+      .attr("x", -5)
+      .attr("y", -6)
+      .attr("width", 10)
+      .attr("height", 10)
+      .attr("rx", 2)
+      .attr("fill", (d) => (d.children ? "#ffa657" : "#58a6ff"))
+      .attr("opacity", 0.8);
+
+    // Labels
+    nodes
+      .append("text")
+      .attr("x", 14)
+      .attr("y", 4)
+      .attr("fill", (d) =>
+        highlightedPath === d.data.path ? "#000" : "#c9d1d9"
+      )
+      .attr("font-size", 11)
+      .attr("font-family", "monospace")
+      .style("cursor", "pointer")
+      .text((d) => {
+        const name = d.data.name;
+        return name.length > 20 ? name.slice(0, 18) + "..." : name;
+      })
+      .on("click", (_, d) => {
+        if (!d.children && d.data.path) {
+          window.open(
+            `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
+            "_blank"
+          );
+        }
+      });
+  }, [fileTree, highlightedPath, owner, repo]);
+
+  const handleSearchSelect = (path: string) => {
+    setHighlightedPath(path);
+    setSearchQuery("");
+  };
+
+  if (!fileTree || fileTree.length === 0) {
+    return (
+      <Box
+        bg="#161b22"
+        border="1px dashed #30363d"
+        borderRadius="lg"
+        p={8}
+        textAlign="center"
+      >
+        <VStack gap={4}>
+          <Text color="#8b949e">No file tree data available</Text>
+        </VStack>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      ref={containerRef}
+      bg="#161b22"
+      border="1px solid #30363d"
+      borderRadius="lg"
+      p={4}
+      position="relative"
+    >
+      {/* Header with Search */}
+      <HStack justify="space-between" mb={4} flexWrap="wrap" gap={3}>
+        <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
+          📊 File Structure
+        </Text>
+
+        {/* Search Input */}
+        <Box position="relative" w={{ base: "100%", md: "300px" }}>
+          <HStack
+            bg="#21262d"
+            border="1px solid #30363d"
+            borderRadius="md"
+            px={3}
+            py={2}
+          >
+            <FaSearch color="#8b949e" size={14} />
+            <Input
+              placeholder="Search files..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              bg="transparent"
+              border="none"
+              color="#c9d1d9"
+              fontSize="sm"
+              _placeholder={{ color: "#6e7681" }}
+              _focus={{ boxShadow: "none" }}
+            />
+          </HStack>
+
+          {/* Search Results Dropdown */}
+          {searchResults.length > 0 && (
+            <Box
+              position="absolute"
+              top="100%"
+              left={0}
+              right={0}
+              mt={1}
+              bg="#21262d"
+              border="1px solid #30363d"
+              borderRadius="md"
+              zIndex={20}
+              maxH="250px"
+              overflowY="auto"
+            >
+              {searchResults.map((file) => (
+                <Box
+                  key={file.path}
+                  px={3}
+                  py={2}
+                  cursor="pointer"
+                  _hover={{ bg: "#30363d" }}
+                  onClick={() => handleSearchSelect(file.path)}
+                >
+                  <Text color="#58a6ff" fontSize="sm" fontFamily="mono">
+                    {file.path}
+                  </Text>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      </HStack>
+
+      {/* Highlighted File Badge */}
+      {highlightedPath && (
+        <HStack mb={3}>
+          <Badge bg="#ffc107" color="#000" px={3} py={1} borderRadius="full">
+            📍 {highlightedPath}
+          </Badge>
+          <Text
+            color="#8b949e"
+            fontSize="xs"
+            cursor="pointer"
+            _hover={{ color: "#c9d1d9" }}
+            onClick={() => setHighlightedPath(null)}
+          >
+            ✕ Clear
+          </Text>
+        </HStack>
+      )}
+
+      {/* Legend */}
+      <HStack mb={4} flexWrap="wrap" gap={3}>
+        <HStack gap={1}>
+          <Box w={3} h={3} borderRadius="sm" bg="#ffa657" />
+          <Text color="#8b949e" fontSize="xs">
+            Folder
+          </Text>
+        </HStack>
+        <HStack gap={1}>
+          <Box w={3} h={3} borderRadius="sm" bg="#58a6ff" />
+          <Text color="#8b949e" fontSize="xs">
+            File (click to open)
+          </Text>
+        </HStack>
+      </HStack>
+
+      {/* SVG Diagram */}
+      <Box overflowX="auto" overflowY="auto" maxH="1200px">
+        <svg ref={svgRef} style={{ display: "block", minWidth: "100%" }} />
+      </Box>
+
+      {/* Help Text */}
+      <Text color="#6e7681" fontSize="xs" mt={3} textAlign="center">
+        Click on files to open in GitHub • Yellow = highlighted from search
+      </Text>
+    </Box>
+  );
+}
