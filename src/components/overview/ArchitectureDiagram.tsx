@@ -1,9 +1,10 @@
 "use client";
-
+import type { FileIssueMapping } from "@/server/types";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Box, Text, VStack, Input, HStack, Badge } from "@chakra-ui/react";
 import { FaSearch } from "react-icons/fa";
 import * as d3 from "d3";
+import { FileDetailsPanel } from "./FileDetailsPanel";
 
 interface FileNode {
   path: string;
@@ -22,6 +23,7 @@ type Props = {
   fileTree: FileNode[];
   owner: string;
   repo: string;
+  fileIssueMap?: FileIssueMapping;
 };
 
 function buildHierarchy(
@@ -50,7 +52,8 @@ function buildHierarchy(
       if (!child) {
         child = {
           name: part,
-          path: currentPath,
+          // Use original file.path for files, currentPath for folders because files show wrong direction
+          path: isFile ? file.path : currentPath,
           ...(isFile ? { value: file.size || 100 } : { children: [] }),
         };
         current.children = current.children || [];
@@ -83,10 +86,16 @@ const FOLDER_COLORS: Record<string, string> = {
   services: "#7ee787",
 };
 
-export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
+export function ArchitectureDiagram({
+  fileTree,
+  owner,
+  repo,
+  fileIssueMap = {},
+}: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
 
   // Filter files for search suggestions
@@ -176,10 +185,14 @@ export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
       .style("cursor", "pointer")
       .on("click", (_, d) => {
         if (!d.children && d.data.path) {
-          window.open(
-            `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
-            "_blank"
-          );
+          if (fileIssueMap[d.data.path]) {
+            setSelectedFile(d.data.path);
+          } else {
+            window.open(
+              `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
+              "_blank"
+            );
+          }
         }
       });
 
@@ -211,13 +224,44 @@ export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
       })
       .on("click", (_, d) => {
         if (!d.children && d.data.path) {
-          window.open(
-            `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
-            "_blank"
-          );
+          if (fileIssueMap[d.data.path]) {
+            setSelectedFile(d.data.path);
+          } else {
+            window.open(
+              `https://github.com/${owner}/${repo}/blob/main/${d.data.path}`,
+              "_blank"
+            );
+          }
         }
       });
-  }, [fileTree, highlightedPath, owner, repo]);
+
+    // Red badge for files with issues (positioned BEFORE the file icon)
+    nodes.each(function (d) {
+      if (!d.children && d.data.path && fileIssueMap[d.data.path]) {
+        const node = d3.select(this);
+        const issueCount = fileIssueMap[d.data.path].issues.length;
+
+        // Red circle badge - positioned before the file icon
+        node
+          .append("circle")
+          .attr("cx", -18)
+          .attr("cy", 0)
+          .attr("r", 7)
+          .attr("fill", "#f85149");
+
+        // Issue count text
+        node
+          .append("text")
+          .attr("x", -18)
+          .attr("y", 3)
+          .attr("text-anchor", "middle")
+          .attr("fill", "white")
+          .attr("font-size", 8)
+          .attr("font-weight", "bold")
+          .text(issueCount);
+      }
+    });
+  }, [fileTree, highlightedPath, owner, repo, fileIssueMap]);
 
   const handleSearchSelect = (path: string) => {
     setHighlightedPath(path);
@@ -344,6 +388,12 @@ export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
             File (click to open)
           </Text>
         </HStack>
+        <HStack gap={1}>
+          <Box w={3} h={3} borderRadius="full" bg="#f85149" />
+          <Text color="#8b949e" fontSize="xs">
+            Has related issues (click to view)
+          </Text>
+        </HStack>
       </HStack>
 
       {/* SVG Diagram */}
@@ -355,6 +405,16 @@ export function ArchitectureDiagram({ fileTree, owner, repo }: Props) {
       <Text color="#6e7681" fontSize="xs" mt={3} textAlign="center">
         Click on files to open in GitHub • Yellow = highlighted from search
       </Text>
+
+      {/* File Details Panel */}
+      {selectedFile && fileIssueMap[selectedFile] && (
+        <FileDetailsPanel
+          filePath={selectedFile}
+          description={fileIssueMap[selectedFile].description}
+          issues={fileIssueMap[selectedFile].issues}
+          onClose={() => setSelectedFile(null)}
+        />
+      )}
     </Box>
   );
 }

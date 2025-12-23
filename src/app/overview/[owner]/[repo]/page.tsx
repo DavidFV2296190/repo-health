@@ -65,7 +65,7 @@ export default function OverviewPage() {
     );
   }
 
-  const { analysis, fileTree, fileCount, totalSize } = data;
+  const { analysis, fileTree, fileCount, totalSize, fileIssueMap } = data;
 
   return (
     <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
@@ -144,7 +144,12 @@ export default function OverviewPage() {
       </Grid>
 
       {/* Architecture Diagram */}
-      <ArchitectureDiagram fileTree={fileTree} owner={owner} repo={repo} />
+      <ArchitectureDiagram
+        fileTree={fileTree}
+        owner={owner}
+        repo={repo}
+        fileIssueMap={fileIssueMap}
+      />
     </Box>
   );
 }
