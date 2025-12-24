@@ -12,7 +12,6 @@ import {
 import { FaProjectDiagram } from "react-icons/fa";
 import { trpc } from "@/trpc/client";
 import {
-  TechStackBadges,
   EntryPointsList,
   KeyFilesList,
   ArchitectureLayers,
@@ -111,9 +110,6 @@ export function ProjectOverviewSection({ owner, repo }: Props) {
             {analysis.type}
           </Badge>
         </HStack>
-
-        {/* Tech Stack */}
-        <TechStackBadges stack={analysis.stack} />
 
         {/* Grid Layout */}
         <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4} my={6}>
