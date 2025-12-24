@@ -54,8 +54,11 @@ export async function getRepoInfo(
 
     await cacheService.set(cacheKey, result, CACHE_TTL.REPO_INFO);
     return result;
-  } catch (error: any) {
-    if (error.status === 404) {
+  } catch (error) {
+    const err = error as Error & {
+      status?: number;
+    };
+    if (err.status === 404) {
       // Cache 404 errors for 5 minutes to avoid repeated API calls
       await cacheService.set(
         cacheKey,
@@ -64,17 +67,17 @@ export async function getRepoInfo(
       );
       throw new Error("REPO_NOT_FOUND_OR_PRIVATE");
     }
-    if (error.message === "PRIVATE_REPO_REQUIRES_AUTH") {
+    if (err.message === "PRIVATE_REPO_REQUIRES_AUTH") {
       // Cache private repo errors for 5 minutes
       await cacheService.set(
         cacheKey,
         { error: "PRIVATE_REPO_REQUIRES_AUTH" },
         300
       );
-      throw error;
+      throw err;
     }
     // Re-throw other errors
-    throw error;
+    throw err;
   }
 }
 

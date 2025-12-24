@@ -71,12 +71,19 @@ export const userRouter = router({
 
         const data = await response.json();
         return (
-          data.items?.map((repo: any) => ({
-            fullName: repo.full_name,
-            owner: repo.owner.login,
-            name: repo.name,
-            private: repo.private,
-          })) || []
+          data.items?.map(
+            (repo: {
+              full_name: string;
+              owner: { login: string };
+              name: string;
+              private: boolean;
+            }) => ({
+              fullName: repo.full_name,
+              owner: repo.owner.login,
+              name: repo.name,
+              private: repo.private,
+            })
+          ) || []
         );
       } catch {
         return [];
