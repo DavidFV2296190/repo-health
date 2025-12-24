@@ -272,3 +272,32 @@ export type FileIssueMapping = {
     issues: IssueReference[];
   };
 };
+
+export type ScoreBreakdownExplanation = {
+  score: number;
+  reason: string;
+  suggestion?: string;
+};
+
+export type ScoreAdjustment = {
+  shouldAdjust: boolean;
+  amount: number; // -20 to +20
+  reason: string;
+  confidence: "low" | "medium" | "high";
+};
+
+export type ScoreInsights = {
+  summary: string;
+  breakdown: {
+    activity: ScoreBreakdownExplanation;
+    maintenance: ScoreBreakdownExplanation;
+    community: ScoreBreakdownExplanation;
+    documentation: ScoreBreakdownExplanation;
+  };
+  adjustment: ScoreAdjustment;
+  recommendations: string[];
+};
+
+export type EnhancedArchitectureAnalysis = ArchitectureAnalysis & {
+  scoreInsights: ScoreInsights;
+};
