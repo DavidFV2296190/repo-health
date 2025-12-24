@@ -1,6 +1,6 @@
 import { PATTERNS, getSeverityWeight, type Severity } from "./patterns";
 import { findHighEntropyStrings } from "./entropy";
-import { maskSecret, getPreview } from "./masker";
+import { getPreview } from "./masker";
 
 export type Finding = {
   patternId: string;

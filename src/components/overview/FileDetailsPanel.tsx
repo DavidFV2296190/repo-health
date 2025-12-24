@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Text,
-  VStack,
-  HStack,
-  Badge,
-  IconButton,
-  Link,
-} from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, IconButton, Link } from "@chakra-ui/react";
 import {
   FaTimes,
   FaExternalLinkAlt,

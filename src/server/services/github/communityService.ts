@@ -28,7 +28,7 @@ export async function getCommunityHealth(
 
     await cacheService.set(cacheKey, result, CACHE_TTL.COMMUNITY);
     return result;
-  } catch (error) {
+  } catch {
     // If endpoint fails, try manual checks
     return await checkCommunityFilesManually(owner, repo, accessToken);
   }
