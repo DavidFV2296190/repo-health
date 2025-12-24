@@ -15,13 +15,11 @@ import { useSession, signIn } from "next-auth/react";
 import { trpc } from "@/trpc/client";
 import { RepoSearchInput } from "@/components/repoInput";
 import { RecentSearches } from "@/components/RecentSearches";
-import { StatCard } from "@/components/cards/StatCard";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingState } from "@/components/LoadingState";
 import { RepositoryCard } from "@/components/cards/RepositoryCard";
 import { CommitListCard } from "@/components/cards/CommitListCard";
 import { ContributorCard } from "@/components/cards/ContributorCard";
-import { LanguageCard } from "@/components/cards/LanguageCard";
 import { HealthScoreCircle } from "@/components/cards/HealthScoreCircle";
 import { DependencySummaryCard } from "@/components/cards/DependencySummaryCard";
 import { PRStatsCard } from "@/components/cards/PRStatsCard";
@@ -174,6 +172,13 @@ export default function HomePage() {
                 name={data.repository.name}
                 description={data.repository.description}
                 language={data.repository.language}
+                stats={{
+                  stars: data.repository.stars || 0,
+                  forks: data.repository.forks || 0,
+                  commits: data.activity?.commits?.length || 0,
+                  openIssues: data.repository.openIssues || 0,
+                }}
+                languages={data.languages}
               />
 
               {isHealthLoading ? (
@@ -201,30 +206,6 @@ export default function HomePage() {
                   </Box>
                 )
               )}
-              {/* Stats Row - Top, Compact */}
-              <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} mb={6}>
-                <StatCard
-                  label="Stars"
-                  value={data.repository.stars?.toLocaleString() || "0"}
-                  icon="⭐"
-                />
-                <StatCard
-                  label="Forks"
-                  value={data.repository.forks?.toLocaleString() || "0"}
-                  icon="🔱"
-                />
-                <StatCard
-                  label="Commits (90d)"
-                  value={data.activity?.commits?.length.toLocaleString() || "0"}
-                  icon="📝"
-                />
-                <StatCard
-                  label="Open Issues"
-                  value={data.repository.openIssues?.toLocaleString() || "0"}
-                  icon="🐛"
-                />
-              </SimpleGrid>
-
               {/* Main Feature Cards - Uniform Grid */}
               {isDepsLoading ? (
                 <Box
@@ -288,10 +269,6 @@ export default function HomePage() {
 
               {data.contributors && data.contributors.length > 0 && (
                 <ContributorCard contributors={data.contributors} />
-              )}
-
-              {data.languages && Object.keys(data.languages).length > 0 && (
-                <LanguageCard languages={data.languages} />
               )}
             </VStack>
           )}
