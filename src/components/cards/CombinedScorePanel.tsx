@@ -1,7 +1,16 @@
 "use client";
 
 import { Box, Text, VStack, HStack, Flex, Badge } from "@chakra-ui/react";
-import { FaArrowDown, FaArrowUp, FaCheck } from "react-icons/fa";
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaCheck,
+  FaHistory,
+  FaWrench,
+  FaUsers,
+  FaBook,
+  FaChartBar,
+} from "react-icons/fa";
 import type { ScoreInsights } from "@/server/types";
 
 type ScoreBreakdown = {
@@ -19,10 +28,34 @@ type CombinedScorePanelProps = {
 };
 
 const WEIGHTS = {
-  activity: { weight: 30, label: "Activity" },
-  maintenance: { weight: 25, label: "Maintenance" },
-  community: { weight: 20, label: "Community" },
-  documentation: { weight: 25, label: "Docs" },
+  activity: {
+    weight: 30,
+    label: "Activity",
+    icon: FaHistory,
+    color: "#58a6ff",
+    desc: "Commit frequency, recency & unique contributors",
+  },
+  maintenance: {
+    weight: 25,
+    label: "Maintenance",
+    icon: FaWrench,
+    color: "#d29922",
+    desc: "Issue ratio, project maturity & update frequency",
+  },
+  community: {
+    weight: 20,
+    label: "Community",
+    icon: FaUsers,
+    color: "#a371f7",
+    desc: "Stars, forks & contributor engagement",
+  },
+  documentation: {
+    weight: 25,
+    label: "Docs",
+    icon: FaBook,
+    color: "#238636",
+    desc: "README, LICENSE, CONTRIBUTING & CODE_OF_CONDUCT",
+  },
 };
 
 const SCORE_THRESHOLDS = [
@@ -46,17 +79,26 @@ function ScoreBar({
   label,
   score,
   weight,
+  icon: Icon,
+  iconColor,
+  desc,
 }: {
   label: string;
   score: number;
   weight: number;
+  icon: React.ComponentType<{ size?: number; color?: string }>;
+  iconColor: string;
+  desc: string;
 }) {
   return (
     <Box>
       <HStack justify="space-between" mb={1}>
-        <Text fontSize="xs" color="#8b949e">
-          {label}
-        </Text>
+        <HStack gap={1}>
+          <Icon size={12} color={iconColor} />
+          <Text fontSize="xs" color="#c9d1d9" fontWeight="medium">
+            {label}
+          </Text>
+        </HStack>
         <HStack gap={1}>
           <Text fontSize="xs" color={getColor(score)} fontWeight="bold">
             {score}
@@ -66,7 +108,7 @@ function ScoreBar({
           </Text>
         </HStack>
       </HStack>
-      <Box bg="#21262d" borderRadius="full" h="4px" overflow="hidden">
+      <Box bg="#21262d" borderRadius="full" h="4px" overflow="hidden" mb={1}>
         <Box
           bg={getColor(score)}
           h="100%"
@@ -75,6 +117,9 @@ function ScoreBar({
           transition="width 0.5s ease"
         />
       </Box>
+      <Text fontSize="2xs" color="#6e7681" lineHeight="1.3">
+        {desc}
+      </Text>
     </Box>
   );
 }
@@ -154,12 +199,12 @@ export function CombinedScorePanel({
           </Box>
 
           {/* Legend */}
-          <HStack gap={1} flexWrap="wrap" justify="center">
+          <HStack gap={2} flexWrap="wrap" justify="center">
             {SCORE_THRESHOLDS.map((t) => (
-              <HStack key={t.label} gap={0.5}>
-                <Box w="6px" h="6px" borderRadius="full" bg={t.color} />
-                <Text fontSize="2xs" color="#6e7681">
-                  {t.min}+
+              <HStack key={t.label} gap={1}>
+                <Box w="8px" h="8px" borderRadius="full" bg={t.color} />
+                <Text fontSize="2xs" color={t.color} fontWeight="medium">
+                  {t.min}+ {t.label}
                 </Text>
               </HStack>
             ))}
@@ -176,47 +221,50 @@ export function CombinedScorePanel({
           pb={{ base: 4, lg: 0 }}
           borderBottom={{ base: "1px solid #30363d", lg: "none" }}
         >
-          <HStack gap={2} mb={1}>
+          <HStack gap={2} mb={2}>
+            <FaChartBar color="#58a6ff" size={16} />
             <Text fontSize="sm" color="#c9d1d9" fontWeight="semibold">
               Score Breakdown
             </Text>
-            <Badge
-              bg="#21262d"
-              color="#8b949e"
-              px={2}
-              py={0.5}
-              borderRadius="md"
-              fontSize="2xs"
-            >
-              CHAOSS
-            </Badge>
           </HStack>
 
           {breakdown && (
             <Box
               display="grid"
               gridTemplateColumns={{ base: "1fr", md: "1fr 1fr" }}
-              gap={2}
+              gap={4}
             >
               <ScoreBar
                 label={WEIGHTS.activity.label}
                 score={breakdown.activityScore}
                 weight={WEIGHTS.activity.weight}
+                icon={WEIGHTS.activity.icon}
+                iconColor={WEIGHTS.activity.color}
+                desc={WEIGHTS.activity.desc}
               />
               <ScoreBar
                 label={WEIGHTS.maintenance.label}
                 score={breakdown.maintenanceScore}
                 weight={WEIGHTS.maintenance.weight}
+                icon={WEIGHTS.maintenance.icon}
+                iconColor={WEIGHTS.maintenance.color}
+                desc={WEIGHTS.maintenance.desc}
               />
               <ScoreBar
                 label={WEIGHTS.community.label}
                 score={breakdown.communityScore}
                 weight={WEIGHTS.community.weight}
+                icon={WEIGHTS.community.icon}
+                iconColor={WEIGHTS.community.color}
+                desc={WEIGHTS.community.desc}
               />
               <ScoreBar
                 label={WEIGHTS.documentation.label}
                 score={breakdown.documentationScore}
                 weight={WEIGHTS.documentation.weight}
+                icon={WEIGHTS.documentation.icon}
+                iconColor={WEIGHTS.documentation.color}
+                desc={WEIGHTS.documentation.desc}
               />
             </Box>
           )}
@@ -224,17 +272,16 @@ export function CombinedScorePanel({
 
         {/* RIGHT: AI Analysis */}
         <VStack align="stretch" flex={1} gap={2}>
-          <Text fontSize="sm" color="#c9d1d9" fontWeight="semibold">
-            AI Analysis
-          </Text>
+          <HStack gap={2}>
+            <FaChartBar color="#a371f7" size={16} />
+            <Text fontSize="sm" color="#c9d1d9" fontWeight="semibold">
+              AI Analysis
+            </Text>
+          </HStack>
 
           <Text fontSize="xs" color="#8b949e" lineHeight="1.5">
-            📊 Score calculated using{" "}
-            <Text as="span" color="#58a6ff" fontWeight="medium">
-              CHAOSS
-            </Text>{" "}
-            (Community Health Analytics) metrics formula. AI reviews project
-            context and may adjust by ±20 points.
+            Score calculated using community health metrics formula. AI reviews
+            project context and may adjust by ±20 points.
           </Text>
 
           {/* AI Adjustment */}

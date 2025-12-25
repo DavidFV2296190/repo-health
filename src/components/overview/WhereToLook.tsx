@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Text, VStack, HStack, Badge } from "@chakra-ui/react";
+import { FaSearch } from "react-icons/fa";
 
 type Props = {
   whereToLook: Record<string, string[]>;
@@ -17,9 +18,12 @@ export function WhereToLook({ whereToLook, owner, repo }: Props) {
 
   return (
     <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={6}>
-      <Text fontSize="lg" fontWeight="600" mb={4} color="#c9d1d9">
-        🔍 Where to Look
-      </Text>
+      <HStack gap={2} mb={4}>
+        <FaSearch color="#d29922" size={18} />
+        <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
+          Where to Look
+        </Text>
+      </HStack>
       <VStack align="stretch" gap={4}>
         {entries.map(([category, files]) => (
           <Box key={category}>

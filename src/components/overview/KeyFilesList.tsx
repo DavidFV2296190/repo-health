@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Text, VStack, Flex } from "@chakra-ui/react";
-import { FaExternalLinkAlt, FaArrowRight } from "react-icons/fa";
+import { Box, Text, VStack, Flex, HStack } from "@chakra-ui/react";
+import { FaExternalLinkAlt, FaArrowRight, FaFileAlt } from "react-icons/fa";
 
 type KeyFile = {
   path: string;
@@ -22,9 +22,12 @@ export function KeyFilesList({ keyFiles, owner, repo }: Props) {
 
   return (
     <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={6}>
-      <Text fontSize="lg" fontWeight="600" mb={4} color="#c9d1d9">
-        📄 Key Files
-      </Text>
+      <HStack gap={2} mb={4}>
+        <FaFileAlt color="#58a6ff" size={18} />
+        <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
+          Key Files
+        </Text>
+      </HStack>
       <VStack align="stretch" gap={3}>
         {keyFiles.map((kf) => (
           <Flex

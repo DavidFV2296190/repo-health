@@ -1,4 +1,5 @@
-import { Box, Heading, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Heading, SimpleGrid, Text, HStack } from "@chakra-ui/react";
+import { FaUsers } from "react-icons/fa";
 
 interface Contributor {
   username?: string;
@@ -20,9 +21,12 @@ export function ContributorCard({
       borderRadius="lg"
       boxShadow="0 8px 24px rgba(0, 0, 0, 0.5)"
     >
-      <Heading size="xl" mb={6} color="#c9d1d9">
-        👥 Top Contributors
-      </Heading>
+      <HStack gap={2} mb={6}>
+        <FaUsers color="#58a6ff" size={24} />
+        <Heading size="xl" color="#c9d1d9">
+          Top Contributors
+        </Heading>
+      </HStack>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
         {contributors.slice(0, maxDisplay).map((contributor) => (
           <Box

@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Text, VStack, Flex } from "@chakra-ui/react";
-import { FaExternalLinkAlt, FaArrowRight } from "react-icons/fa";
+import { Box, Text, VStack, Flex, HStack } from "@chakra-ui/react";
+import { FaExternalLinkAlt, FaArrowRight, FaDoorOpen } from "react-icons/fa";
 
 type EntryPoint = {
   path: string;
@@ -22,9 +22,12 @@ export function EntryPointsList({ entryPoints, owner, repo }: Props) {
 
   return (
     <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={6}>
-      <Text fontSize="lg" fontWeight="600" mb={4} color="#c9d1d9">
-        🚪 Entry Points
-      </Text>
+      <HStack gap={2} mb={4}>
+        <FaDoorOpen color="#f85149" size={18} />
+        <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
+          Entry Points
+        </Text>
+      </HStack>
       <VStack align="stretch" gap={3}>
         {entryPoints.map((ep) => (
           <Flex

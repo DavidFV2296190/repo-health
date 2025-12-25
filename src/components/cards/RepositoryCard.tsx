@@ -6,12 +6,7 @@ import {
   HStack,
   SimpleGrid,
 } from "@chakra-ui/react";
-import {
-  FaStar,
-  FaCodeBranch,
-  FaCode,
-  FaExclamationCircle,
-} from "react-icons/fa";
+import { FaStar, FaCodeBranch, FaCode, FaBug } from "react-icons/fa";
 
 type RepoStats = {
   stars: number;
@@ -112,7 +107,7 @@ export function RepositoryCard({
             borderRadius="md"
             justify="center"
           >
-            <FaExclamationCircle color="#f85149" />
+            <FaBug color="#f85149" />
             <Text color="#c9d1d9" fontWeight="600">
               {stats.openIssues.toLocaleString()}
             </Text>

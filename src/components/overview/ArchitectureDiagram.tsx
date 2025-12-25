@@ -2,7 +2,7 @@
 import type { FileIssueMapping } from "@/server/types";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Box, Text, VStack, Input, HStack, Badge } from "@chakra-ui/react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSitemap, FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import * as d3 from "d3";
 import { FileDetailsPanel } from "./FileDetailsPanel";
 
@@ -295,9 +295,12 @@ export function ArchitectureDiagram({
     >
       {/* Header with Search */}
       <HStack justify="space-between" mb={4} flexWrap="wrap" gap={3}>
-        <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
-          📊 File Structure
-        </Text>
+        <HStack gap={2}>
+          <FaSitemap color="#58a6ff" size={18} />
+          <Text fontSize="lg" fontWeight="600" color="#c9d1d9">
+            File Structure
+          </Text>
+        </HStack>
 
         {/* Search Input */}
         <Box position="relative" w={{ base: "100%", md: "300px" }}>
@@ -360,17 +363,22 @@ export function ArchitectureDiagram({
       {highlightedPath && (
         <HStack mb={3}>
           <Badge bg="#ffc107" color="#000" px={3} py={1} borderRadius="full">
-            📍 {highlightedPath}
+            <HStack gap={1}>
+              <FaMapMarkerAlt size={10} />
+              <Text>{highlightedPath}</Text>
+            </HStack>
           </Badge>
-          <Text
+          <HStack
             color="#8b949e"
             fontSize="xs"
             cursor="pointer"
             _hover={{ color: "#c9d1d9" }}
             onClick={() => setHighlightedPath(null)}
+            gap={1}
           >
-            ✕ Clear
-          </Text>
+            <FaTimes size={10} />
+            <Text>Clear</Text>
+          </HStack>
         </HStack>
       )}
 
