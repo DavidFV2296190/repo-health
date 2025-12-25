@@ -1,9 +1,11 @@
 import { Box, Heading, SimpleGrid, Text, HStack } from "@chakra-ui/react";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaExternalLinkAlt } from "react-icons/fa";
+import Link from "next/link";
 
 interface Contributor {
   username?: string;
   contributions: number;
+  url?: string;
 }
 
 export function ContributorCard({
@@ -36,10 +38,34 @@ export function ContributorCard({
             borderRadius="lg"
             borderLeft="4px solid"
             borderColor="#58a6ff"
+            transition="all 0.2s ease"
+            _hover={{ bg: "#161b22" }}
           >
-            <Text fontWeight="bold" color="#c9d1d9">
-              {contributor.username}
-            </Text>
+            {contributor.url ? (
+              <Link
+                href={contributor.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <HStack justify="space-between" align="center">
+                  <Text
+                    fontWeight="bold"
+                    color="#c9d1d9"
+                    _hover={{ color: "#58a6ff" }}
+                    transition="color 0.2s ease"
+                  >
+                    {contributor.username}
+                  </Text>
+                  <Box color="#8b949e" _hover={{ color: "#58a6ff" }}>
+                    <FaExternalLinkAlt size={10} />
+                  </Box>
+                </HStack>
+              </Link>
+            ) : (
+              <Text fontWeight="bold" color="#c9d1d9">
+                {contributor.username}
+              </Text>
+            )}
             <Text fontSize="sm" color="#8b949e">
               {contributor.contributions} contributions
             </Text>
