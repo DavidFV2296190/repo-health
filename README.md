@@ -114,7 +114,7 @@ Analyze pull request patterns and community contributor behavior.
 
 ### In Progress (~15%)
 
-- [ ] UI polish and responsive design
+- [x] UI polish and responsive design
 - [ ] Search functionality in vulnerability table
 - [ ] Better error handling
 
@@ -334,6 +334,16 @@ npx prisma db push
 
 # Start dev server
 npm run dev
+
+# Build the project
+npm run build
+
+# See linting errors if exists
+npm run lint
+
+# format code
+npm run format
+
 ```
 
 Required environment variables:
