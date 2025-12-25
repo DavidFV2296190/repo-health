@@ -138,7 +138,10 @@ export default function DependencyDashboard() {
       <Container maxW="container.xl">
         <VStack gap={8} align="stretch">
           {/* Back Button */}
-          <Link href="/" style={{ width: "fit-content" }}>
+          <Link
+            href={`/?owner=${owner}&repo=${repo}`}
+            style={{ width: "fit-content" }}
+          >
             <Button
               variant="ghost"
               color="#8b949e"

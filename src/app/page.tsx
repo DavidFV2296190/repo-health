@@ -26,6 +26,7 @@ import { IssueStatsCard } from "@/components/cards/IssueStatsCard";
 import { SecurityCard } from "@/components/cards/SecurityCard";
 import { ActivityCard } from "@/components/anomaly/ActivityCard";
 import { ProjectOverviewSection } from "@/components/overview";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const toaster = createToaster({
   placement: "bottom",
@@ -35,6 +36,8 @@ const toaster = createToaster({
 
 export default function HomePage() {
   const { status } = useSession();
+  const searchParamsUrl = useSearchParams();
+  const router = useRouter();
   const [searchParams, setSearchParams] = useState<{
     owner: string;
     repo: string;
@@ -73,6 +76,14 @@ export default function HomePage() {
     });
 
   useEffect(() => {
+    const owner = searchParamsUrl.get("owner");
+    const repo = searchParamsUrl.get("repo");
+    if (owner && repo && !searchParams) {
+      setSearchParams({ owner, repo });
+    }
+  }, [searchParamsUrl, searchParams]);
+
+  useEffect(() => {
     if (error && searchAttempt > 0) {
       setTimeout(() => {
         const isNotAuthenticated = status === "unauthenticated";
@@ -98,6 +109,7 @@ export default function HomePage() {
   const handleSearch = (owner: string, repo: string) => {
     setSearchParams({ owner, repo });
     setSearchAttempt((prev) => prev + 1);
+    router.push(`/?owner=${owner}&repo=${repo}`, { scroll: false });
 
     if (isSignedIn) {
       saveSearchMutation.mutate({ owner, repo });

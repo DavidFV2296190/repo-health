@@ -170,7 +170,10 @@ export function PRDetailsPage({ stats, owner, repo }: Props) {
 
   return (
     <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
-      <Link href="/" style={{ width: "fit-content" }}>
+      <Link
+        href={`/?owner=${owner}&repo=${repo}`}
+        style={{ width: "fit-content" }}
+      >
         <Button
           variant="ghost"
           color="#8b949e"
