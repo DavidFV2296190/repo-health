@@ -107,14 +107,21 @@ function HomePageContent() {
     }
   }, [searchAttempt, error, status]);
 
+  // Save search after being sure if repo is private
+  useEffect(() => {
+    if (data && searchParams && isSignedIn) {
+      saveSearchMutation.mutate({
+        owner: searchParams.owner,
+        repo: searchParams.repo,
+        isPrivate: data.repository.isPrivate ?? false,
+      });
+    }
+  }, [data, searchParams, isSignedIn]);
+
   const handleSearch = (owner: string, repo: string) => {
     setSearchParams({ owner, repo });
     setSearchAttempt((prev) => prev + 1);
     router.push(`/?owner=${owner}&repo=${repo}`, { scroll: false });
-
-    if (isSignedIn) {
-      saveSearchMutation.mutate({ owner, repo });
-    }
   };
 
   return (

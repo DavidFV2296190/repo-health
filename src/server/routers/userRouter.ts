@@ -30,9 +30,15 @@ export const userRouter = router({
     });
   }),
   saveSearch: protectedProcedure
-    .input(z.object({ owner: z.string(), repo: z.string() }))
+    .input(
+      z.object({
+        owner: z.string(),
+        repo: z.string(),
+        isPrivate: z.boolean().optional().default(false),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      const { owner, repo } = input;
+      const { owner, repo, isPrivate } = input;
       return prisma.searchHistory.upsert({
         where: {
           userId_owner_repo: {
@@ -41,27 +47,32 @@ export const userRouter = router({
             repo,
           },
         },
-        update: { searchedAt: new Date() },
+        update: { searchedAt: new Date(), isPrivate },
         create: {
           userId: ctx.session.user.id,
           owner,
           repo,
           fullName: `${owner}/${repo}`,
+          isPrivate,
         },
       });
     }),
 
   searchRepos: publicProcedure
     .input(z.object({ query: z.string().min(2) }))
-    .query(async ({ input }): Promise<RepoSuggestion[]> => {
+    .query(async ({ input, ctx }): Promise<RepoSuggestion[]> => {
       try {
+        // Use the current user's access token if signed in, otherwise fall back to app token
+        // This ensures private repos only appear for their actual owner
+        const token = ctx.session?.accessToken || process.env.GITHUB_TOKEN;
+
         const response = await fetch(
           `https://api.github.com/search/repositories?q=${encodeURIComponent(input.query)}&per_page=5`,
           {
             headers: {
               Accept: "application/vnd.github.v3+json",
-              ...(process.env.GITHUB_TOKEN && {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+              ...(token && {
+                Authorization: `Bearer ${token}`,
               }),
             },
           }
