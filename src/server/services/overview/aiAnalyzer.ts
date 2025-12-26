@@ -63,6 +63,18 @@ export async function analyzeArchitecture(
     ".java",
     ".rb",
     ".php",
+    ".cs",
+    ".csproj",
+    ".sln",
+    ".cshtml",
+    ".swift",
+    ".kt",
+    ".c",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".lua",
+    ".sh",
   ];
   const limitedFiles = files
     .filter((f) => importantExtensions.some((ext) => f.path.endsWith(ext)))
@@ -104,14 +116,14 @@ METRICS:
 - Updated: ${repoInfo.updatedAt}, Created: ${repoInfo.createdAt}
 `;
   }
-  prompt += `Return JSON:
+  prompt += `Return JSON (IMPORTANT: all paths MUST be from the file list above, not descriptions):
 {
   "type": "monolith|monorepo|library",
   "stack": ["tech"],
   "layers": {"name": "desc"},
-  "entryPoints": [{"path": "", "description": ""}],
-  "keyFiles": [{"path": "", "purpose": ""}],
-  "whereToLook": {"feature": ["paths"]}${
+  "entryPoints": [{"path": "exact/path/from/list.ext", "description": "what it does"}],
+  "keyFiles": [{"path": "exact/path/from/list.ext", "purpose": "what it does"}],
+  "whereToLook": {"feature": ["exact/paths/from/list"]}${
     healthScore
       ? `,
   "scoreInsights": {

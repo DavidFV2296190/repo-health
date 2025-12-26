@@ -12,13 +12,19 @@ type Props = {
   keyFiles: KeyFile[];
   owner: string;
   repo: string;
+  defaultBranch?: string;
 };
 
-export function KeyFilesList({ keyFiles, owner, repo }: Props) {
+export function KeyFilesList({
+  keyFiles,
+  owner,
+  repo,
+  defaultBranch = "main",
+}: Props) {
   if (!keyFiles.length) return null;
 
   const githubUrl = (path: string) =>
-    `https://github.com/${owner}/${repo}/blob/main/${path}`;
+    `https://github.com/${owner}/${repo}/blob/${defaultBranch}/${path}`;
 
   return (
     <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={6}>

@@ -61,6 +61,7 @@ export const overviewRouter = router({
         fileCount: allFiles.length,
         totalSize: allFiles.reduce((sum, f) => sum + (f.size || 0), 0),
         fileIssueMap,
+        defaultBranch: repoInfo.defaultBranch || "main",
         healthScore: {
           ...healthScore,
           aiAdjustment,

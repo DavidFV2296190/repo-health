@@ -64,6 +64,7 @@ export function ProjectOverviewSection({ owner, repo }: Props) {
     totalSize,
     fileIssueMap,
     healthScore,
+    defaultBranch,
   } = data;
 
   return (
@@ -116,17 +117,20 @@ export function ProjectOverviewSection({ owner, repo }: Props) {
             entryPoints={analysis.entryPoints}
             owner={owner}
             repo={repo}
+            defaultBranch={defaultBranch}
           />
           <KeyFilesList
             keyFiles={analysis.keyFiles}
             owner={owner}
             repo={repo}
+            defaultBranch={defaultBranch}
           />
           <ArchitectureLayers layers={analysis.layers} />
           <WhereToLook
             whereToLook={analysis.whereToLook}
             owner={owner}
             repo={repo}
+            defaultBranch={defaultBranch}
           />
         </Grid>
 

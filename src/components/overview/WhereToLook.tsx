@@ -7,14 +7,20 @@ type Props = {
   whereToLook: Record<string, string[]>;
   owner: string;
   repo: string;
+  defaultBranch?: string;
 };
 
-export function WhereToLook({ whereToLook, owner, repo }: Props) {
+export function WhereToLook({
+  whereToLook,
+  owner,
+  repo,
+  defaultBranch = "main",
+}: Props) {
   const entries = Object.entries(whereToLook);
   if (!entries.length) return null;
 
   const githubUrl = (path: string) =>
-    `https://github.com/${owner}/${repo}/blob/main/${path}`;
+    `https://github.com/${owner}/${repo}/blob/${defaultBranch}/${path}`;
 
   return (
     <Box bg="#161b22" border="1px solid #30363d" borderRadius="lg" p={6}>
