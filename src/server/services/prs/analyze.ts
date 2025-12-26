@@ -1,4 +1,5 @@
 import { cacheService } from "@/lib/redis";
+import { getTokenHash } from "../github/shared";
 import { Octokit } from "@octokit/rest";
 import type {
   PRStats,
@@ -355,8 +356,8 @@ type AnalyzeOptions = {
 export async function analyze(options: AnalyzeOptions): Promise<PRStats> {
   const { owner, repo, token } = options;
 
-  // SECURITY: Include auth in cache key to isolate private repo data
-  const cacheKey = `prs:${owner}:${repo}${token ? ":auth" : ""}`;
+  // the same technique here for cache isolation
+  const cacheKey = `prs:${owner}:${repo}:${getTokenHash(token)}`;
   const cached = await cacheService.get<PRStats>(cacheKey);
   if (cached) {
     return cached;
