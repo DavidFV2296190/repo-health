@@ -117,8 +117,15 @@ export function RepoSearchInput({
     if (!repoUrl || repoUrl.length < 2) return [];
 
     const results = fuse.search(repoUrl);
-    return results.slice(0, 8).map((result) => result.item);
-  }, [repoUrl, fuse]);
+    const items = results.slice(0, 8).map((result) => result.item);
+
+    // Filter out private repos if user is not signed in
+    if (!isSignedIn) {
+      return items.filter((repo) => !repo.private);
+    }
+
+    return items;
+  }, [repoUrl, fuse, isSignedIn]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
