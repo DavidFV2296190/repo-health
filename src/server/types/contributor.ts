@@ -35,8 +35,16 @@ export type PitfallAnalysis = {
   category: "tests" | "style" | "scope" | "setup" | "breaking" | "docs";
 };
 
+export type SpammerProfile = {
+  username: string;
+  avatarUrl: string;
+  prNumber: number;
+  reason: string;
+};
+
 export type PitfallsResult = {
   analyses: PitfallAnalysis[];
   patterns: string[];
   analyzedCount: number;
+  spammers: SpammerProfile[];
 };
