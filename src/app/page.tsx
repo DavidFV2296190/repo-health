@@ -87,7 +87,7 @@ function HomePageContent() {
   const { data: pitfalls } = trpc.contributor.getPitfalls.useQuery(
     searchParams!,
     {
-      enabled: searchParams !== null,
+      enabled: searchParams !== null && !!data,
       retry: false,
       staleTime: 1000 * 60 * 5,
     }
@@ -202,79 +202,81 @@ function HomePageContent() {
                 languages={data.languages}
               />
 
+              {/* Project Overview - Full Width Section */}
+              {searchParams && (
+                <ProjectOverviewSection
+                  owner={searchParams.owner}
+                  repo={searchParams.repo}
+                />
+              )}
+
               {/* Main Feature Cards - Uniform Grid */}
-              {isDepsLoading ? (
-                <Box
-                  bg="#161b22"
-                  border="1px solid #30363d"
-                  p={6}
-                  borderRadius="lg"
-                  textAlign="center"
-                >
-                  <Text color="#8b949e">Scanning dependencies...</Text>
-                </Box>
-              ) : (
-                <>
-                  {/* Project Overview - Full Width Section */}
-                  {searchParams && (
-                    <ProjectOverviewSection
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
+                {isDepsLoading ? (
+                  <Box
+                    bg="#161b22"
+                    border="1px solid #30363d"
+                    p={6}
+                    borderRadius="lg"
+                    textAlign="center"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    minH="200px"
+                  >
+                    <Text color="#8b949e">Scanning dependencies...</Text>
+                  </Box>
+                ) : (
+                  dependencies &&
+                  searchParams && (
+                    <DependencySummaryCard
+                      summary={dependencies.summary}
                       owner={searchParams.owner}
                       repo={searchParams.repo}
                     />
-                  )}
+                  )
+                )}
 
-                  {/* Main Feature Cards */}
-                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-                    {dependencies && searchParams && (
-                      <DependencySummaryCard
-                        summary={dependencies.summary}
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                    {prStats && searchParams && (
-                      <PRStatsCard
-                        stats={prStats}
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                    {searchParams && (
-                      <IssueStatsCard
-                        openIssues={data.repository.openIssues || 0}
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                    {searchParams && (
-                      <ActivityCard
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                    {pitfalls && searchParams && (
-                      <PitfallsSummaryCard
-                        analyzedCount={pitfalls.analyzedCount}
-                        topCategories={Object.entries(
-                          pitfalls.analyses.reduce(
-                            (acc: Record<string, number>, item) => {
-                              acc[item.category] =
-                                (acc[item.category] || 0) + 1;
-                              return acc;
-                            },
-                            {}
-                          )
-                        )
-                          .map(([category, count]) => ({ category, count }))
-                          .sort((a, b) => b.count - a.count)}
-                        topPattern={pitfalls.patterns[0] || null}
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                  </SimpleGrid>
-                </>
-              )}
+                {prStats && searchParams && (
+                  <PRStatsCard
+                    stats={prStats}
+                    owner={searchParams.owner}
+                    repo={searchParams.repo}
+                  />
+                )}
+                {searchParams && (
+                  <IssueStatsCard
+                    openIssues={data.repository.openIssues || 0}
+                    owner={searchParams.owner}
+                    repo={searchParams.repo}
+                  />
+                )}
+                {searchParams && (
+                  <ActivityCard
+                    owner={searchParams.owner}
+                    repo={searchParams.repo}
+                  />
+                )}
+                {pitfalls && searchParams && (
+                  <PitfallsSummaryCard
+                    analyzedCount={pitfalls.analyzedCount}
+                    topCategories={Object.entries(
+                      pitfalls.analyses.reduce(
+                        (acc: Record<string, number>, item) => {
+                          acc[item.category] = (acc[item.category] || 0) + 1;
+                          return acc;
+                        },
+                        {}
+                      )
+                    )
+                      .map(([category, count]) => ({ category, count }))
+                      .sort((a, b) => b.count - a.count)}
+                    topPattern={pitfalls.patterns[0] || null}
+                    owner={searchParams.owner}
+                    repo={searchParams.repo}
+                  />
+                )}
+              </SimpleGrid>
 
               {data.activity?.commits && data.activity.commits.length > 0 && (
                 <CommitListCard commits={data.activity.commits} />
