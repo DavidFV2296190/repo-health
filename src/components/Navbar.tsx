@@ -20,7 +20,6 @@ import {
   FaCodeBranch,
   FaBug,
   FaBox,
-  FaShieldAlt,
   FaChartLine,
 } from "react-icons/fa";
 import Link from "next/link";
@@ -33,14 +32,9 @@ export function Navbar() {
   const pathParts = pathname.split("/").filter(Boolean);
   const isAnalysisPage =
     pathParts.length >= 3 &&
-    [
-      "prs",
-      "issues",
-      "dependencies",
-      "security",
-      "activity",
-      "overview",
-    ].includes(pathParts[0]);
+    ["prs", "issues", "dependencies", "activity", "overview"].includes(
+      pathParts[0]
+    );
   const owner = isAnalysisPage ? pathParts[1] : null;
   const repo = isAnalysisPage ? pathParts[2] : null;
 
@@ -48,7 +42,6 @@ export function Navbar() {
     { href: "prs", label: "Pull Requests", icon: FaCodeBranch },
     { href: "issues", label: "Issues", icon: FaBug },
     { href: "dependencies", label: "Dependencies", icon: FaBox },
-    { href: "security", label: "Security", icon: FaShieldAlt },
     { href: "activity", label: "Activity", icon: FaChartLine },
   ];
 

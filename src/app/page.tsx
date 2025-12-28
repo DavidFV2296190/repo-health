@@ -23,7 +23,6 @@ import { ContributorCard } from "@/components/cards/ContributorCard";
 import { DependencySummaryCard } from "@/components/cards/DependencySummaryCard";
 import { PRStatsCard } from "@/components/cards/PRStatsCard";
 import { IssueStatsCard } from "@/components/cards/IssueStatsCard";
-import { SecurityCard } from "@/components/cards/SecurityCard";
 import { ActivityCard } from "@/components/anomaly/ActivityCard";
 import { ProjectOverviewSection } from "@/components/overview";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -233,12 +232,6 @@ function HomePageContent() {
                     {searchParams && (
                       <IssueStatsCard
                         openIssues={data.repository.openIssues || 0}
-                        owner={searchParams.owner}
-                        repo={searchParams.repo}
-                      />
-                    )}
-                    {searchParams && (
-                      <SecurityCard
                         owner={searchParams.owner}
                         repo={searchParams.repo}
                       />
