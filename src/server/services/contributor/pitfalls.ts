@@ -45,8 +45,8 @@ async function fetchRejectedPRs(octokit: Octokit, owner: string, repo: string) {
     return isNotMerged && isFromCommunity;
   });
 
-  // Limit to 50 most recent for larger repos
-  return rejectedCommunityPRs.slice(0, 50);
+  // Limit to 30 most recent for reasonable token usage and speed
+  return rejectedCommunityPRs.slice(0, 30);
 }
 
 // Spam detection patterns
