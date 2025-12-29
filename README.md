@@ -98,38 +98,43 @@ Analyze pull request patterns and community contributor behavior.
 
 ---
 
-## Roadmap Progress
+## Roadmap
 
-### Completed (~80%)
+### Completed
 
 - [x] Next.js + tRPC + Prisma setup
 - [x] GitHub API integration with caching
 - [x] Health Score algorithm
 - [x] GitHub OAuth for private repos
-- [x] Dependency vulnerability scanning (6 languages)
+- [x] Dependency vulnerability scanning (6 languages) _(content may evolve to better align with project goals)_
 - [x] Related PRs search
 - [x] Issue existence check
-- [x] **PR Analytics** - Merge times, author breakdown, AI detection
-- [x] **Contributor Journey** - Sankey diagram visualization
-- [x] **AI Interaction Tracking** - Community wrestling with AI reviews
-- [x] **Search History** - Save searches for logged-in users, autocomplete with Fuse.js
-- [x] **Issue Analytics** - Crackability scores, hidden gems, hot issues
-- [x] **Activity Monitor** - Anomaly detection using Z-score analysis, burst detection, churn analysis
-- [x] **Project Overview** - D3 architecture diagram with AI-powered file-issue mapping
+- [x] PR Analytics - Merge times, author breakdown, AI detection
+- [x] Contributor Journey - Sankey diagram visualization
+- [x] AI Interaction Tracking - Community wrestling with AI reviews
+- [x] Search History - Save searches for logged-in users
+- [x] Issue Analytics - Crackability scores, hidden gems, hot issues
+- [x] Activity Monitor - Anomaly detection using Z-score analysis
+- [x] Project Overview - D3 architecture diagram with AI-powered file-issue mapping
+- [x] Contribution Insights - Spam detection and AI-powered rejection analysis
 
-### In Progress (~15%)
+### In Progress
 
-- [x] UI polish and responsive design
-- [ ] Search functionality in vulnerability table
+- [ ] UI polish and responsive design
 - [ ] Better error handling
+- [ ] Comprehensive test suite
 
-### Planned (~10%)
+### Future Plans
 
-- [ ] **Discussions Analysis** - Community engagement metrics
-- [ ] Community reports system
-- [ ] Setup time estimation
-- [ ] More languages (Java/Maven, PHP/Composer)
-- [ ] Historical trend charts
+| Feature                    | Description                                                                |
+| -------------------------- | -------------------------------------------------------------------------- |
+| Feature Request Validation | Help maintainers identify feature requests outside project scope           |
+| Funding Promotion          | Highlight GitHub Sponsors, Open Collective, Buy Me a Coffee                |
+| Project Lifecycle Status   | Display Active, Maintenance Mode, Archived, Company-backed, Solo Developer |
+| Common Setup Mistakes      | Extract patterns from CONTRIBUTING.md and failed CI builds                 |
+| Experience Level Filter    | Dropdown: First Contributor, Beginner, Expert at Stack, I am Cooked        |
+
+These are my current ideas. Have a feature request? Open an issue.
 
 ---
 
