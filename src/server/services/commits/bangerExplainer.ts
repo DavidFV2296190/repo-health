@@ -25,8 +25,11 @@ function getTemplateExplanation(
       return `Code refactoring${scope ? ` in ${scope}` : ""}`;
     case "perf":
       return `Performance improvement${scope ? ` for ${scope}` : ""}`;
+    case "other":
+      // Simple fallback for non-conventional commits
+      return "Recent code change";
     default:
-      return null; //  Here this requires AI
+      return null;
   }
 }
 

@@ -50,6 +50,13 @@ export function getTopBangers(commits: Commit[], count = 5): ScoredCommit[] {
   const sorted = significant.sort(
     (current, next) => next.score - current.score
   );
-  // Return only the top N
-  return sorted.slice(0, count);
+
+  // If we have significant commits, return them
+  if (sorted.length > 0) {
+    return sorted.slice(0, count);
+  }
+
+  // Fallback: return most recent commits with "other" type
+  // This handles repos that don't use conventional commits
+  return scored.slice(0, count);
 }
