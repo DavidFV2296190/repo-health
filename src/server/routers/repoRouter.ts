@@ -2,6 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure } from "../../trpc/init";
 import { githubService } from "../services/github";
 import { prisma } from "../../lib/prisma";
+import { getBangerCommits } from "../services/commits/bangerService";
 
 const repoInput = z.object({
   owner: z.string(),
@@ -85,6 +86,12 @@ export const repoRouter = router({
             ),
           ]);
 
+        const bangerCommits = await getBangerCommits(
+          commits,
+          input.owner,
+          input.repo,
+          accessToken
+        );
         // Only store PUBLIC repos in the shared database
         if (!repoInfo.isPrivate) {
           await prisma.repository.upsert({
@@ -105,7 +112,7 @@ export const repoRouter = router({
 
         return {
           repository: repoInfo,
-          activity: { commits, commitCount: commits.length },
+          activity: { bangerCommits, commitCount: commits.length },
           contributors,
           languages,
           communityHealth,

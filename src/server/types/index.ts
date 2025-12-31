@@ -1,5 +1,6 @@
 export * from "./contributor";
 export * from "./funding";
+export * from "./banger";
 
 export type RepoInfo = {
   name: string;
@@ -14,20 +15,6 @@ export type RepoInfo = {
   createdAt: string;
   updatedAt: string;
   isPrivate: boolean;
-};
-
-export type Commit = {
-  sha: string;
-  message: string;
-  author: string;
-  date: string;
-  url: string;
-};
-
-export type CommitWithStats = Commit & {
-  additions: number;
-  deletions: number;
-  files: string[];
 };
 
 export type Contributor = {
