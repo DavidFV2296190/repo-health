@@ -61,6 +61,9 @@ src/
 │   ├── services/
 │   │   ├── github/           # GitHub API
 │   │   ├── deps/             # Dependency analysis
+│   │   ├── commits/          # Banger commits scoring & explanations
+│   │   ├── funding/          # FUNDING.yml parsing
+│   │   ├── contributor/      # Contributor analysis
 │   │   ├── prs/              # PR analysis
 │   │   ├── issues/           # Issue analysis
 │   │   ├── anomaly/          # Activity anomaly detection
@@ -117,6 +120,8 @@ Analyze pull request patterns and community contributor behavior.
 - [x] Activity Monitor - Anomaly detection using Z-score analysis
 - [x] Project Overview - D3 architecture diagram with AI-powered file-issue mapping
 - [x] Contribution Insights - Spam detection and AI-powered rejection analysis
+- [x] Funding Promotion - Parse FUNDING.yml and display sponsor links
+- [x] Banger Commits - Highlight significant commits with scoring (template-first, AI fallback) - Could be improved
 
 ### In Progress
 
@@ -126,13 +131,13 @@ Analyze pull request patterns and community contributor behavior.
 
 ### Future Plans
 
-| Feature                    | Description                                                                |
-| -------------------------- | -------------------------------------------------------------------------- |
-| Feature Request Validation | Help maintainers identify feature requests outside project scope           |
-| Funding Promotion          | Highlight GitHub Sponsors, Open Collective, Buy Me a Coffee                |
-| Project Lifecycle Status   | Display Active, Maintenance Mode, Archived, Company-backed, Solo Developer |
-| Common Setup Mistakes      | Extract patterns from CONTRIBUTING.md and failed CI builds                 |
-| Experience Level Filter    | Dropdown: First Contributor, Beginner, Expert at Stack, I am Cooked        |
+| Feature                     | Description                                                                 |
+| --------------------------- | --------------------------------------------------------------------------- |
+| Feature Request Validation  | Help maintainers identify feature requests outside project scope            |
+| Banger Commits Enhancements | Add commit size scoring (lines changed), author context, configurable count |
+| Project Lifecycle Status    | Display Active, Maintenance Mode, Archived, Company-backed, Solo Developer  |
+| Common Setup Mistakes       | Extract patterns from CONTRIBUTING.md and failed CI builds                  |
+| Experience Level Filter     | Dropdown: First Contributor, Beginner, Expert at Stack, I am Cooked         |
 
 These are my current ideas. Have a feature request? Open an issue.
 
