@@ -237,7 +237,7 @@ function HomePageContent() {
                 stats={{
                   stars: data.repository.stars || 0,
                   forks: data.repository.forks || 0,
-                  commits: data.activity?.commits?.length || 0,
+                  commits: data.activity?.commitCount || 0,
                   openIssues: data.repository.openIssues || 0,
                 }}
                 languages={data.languages}
@@ -320,9 +320,10 @@ function HomePageContent() {
                 )}
               </SimpleGrid>
 
-              {data.activity?.commits && data.activity.commits.length > 0 && (
-                <CommitListCard commits={data.activity.commits} />
-              )}
+              {data.activity?.bangerCommits &&
+                data.activity.bangerCommits.length > 0 && (
+                  <CommitListCard commits={data.activity.bangerCommits} />
+                )}
 
               {data.contributors && data.contributors.length > 0 && (
                 <ContributorCard contributors={data.contributors} />

@@ -2,26 +2,23 @@ import { Box, Heading, VStack, Text, HStack } from "@chakra-ui/react";
 import {
   FaUser,
   FaCalendarAlt,
-  FaGitAlt,
+  FaFire,
   FaExternalLinkAlt,
 } from "react-icons/fa";
 import Link from "next/link";
-
-interface Commit {
-  sha: string;
-  message: string;
-  author: string;
-  date: string;
-  url: string;
-}
+import type { BangerCommit } from "@/server/types";
 
 export function CommitListCard({
   commits,
   maxDisplay = 5,
 }: {
-  commits: Commit[];
+  commits: BangerCommit[];
   maxDisplay?: number;
 }) {
+  if (commits.length === 0) {
+    return null;
+  }
+
   return (
     <Box
       bg="#161b22"
@@ -32,10 +29,10 @@ export function CommitListCard({
     >
       <HStack gap={3} mb={4}>
         <Box bg="rgba(88, 166, 255, 0.15)" p={2} borderRadius="md">
-          <FaGitAlt color="#58a6ff" size={20} />
+          <FaFire color="#f97316" size={20} />
         </Box>
         <Heading size="xl" color="#c9d1d9">
-          Recent Commits (Last 90 Days)
+          Banger Commits
         </Heading>
       </HStack>
       <VStack gap={3} align="stretch">
