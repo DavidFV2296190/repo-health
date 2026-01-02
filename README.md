@@ -282,28 +282,36 @@ npm install
 
 # Set environment variables
 cp .env.example .env
+# Add your GitHub OAuth + OpenAI keys
+
+# Start MySQL and Redis (using Docker Compose)
+docker compose up -d
 
 # Run database migrations
 npx prisma db push
 
 # Start dev server
 npm run dev
-
-# Build the project
-npm run build
-
-# See linting errors if exists
-npm run lint
-
-# format code
-npm run format
-
 ```
 
-Required environment variables:
+> **Without Docker**: Install MySQL and Redis locally, then update `DATABASE_URL` and `REDIS_URL` in your `.env`.
 
-- `DATABASE_URL` - MySQL connection string
-- `REDIS_URL` - Redis connection string
-- `NEXTAUTH_SECRET` - Auth secret
-- `GITHUB_ID` - GitHub OAuth app ID
-- `GITHUB_SECRET` - GitHub OAuth app secret
+### Docker Commands
+
+| Command                  | Description                   |
+| ------------------------ | ----------------------------- |
+| `docker compose up -d`   | Start databases in background |
+| `docker compose ps`      | Check container status        |
+| `docker compose down`    | Stop databases                |
+| `docker compose down -v` | Stop and delete all data      |
+
+### Required Environment Variables
+
+| Variable          | Description                                  |
+| ----------------- | -------------------------------------------- |
+| `DATABASE_URL`    | MySQL connection (default works with Docker) |
+| `REDIS_URL`       | Redis connection (default works with Docker) |
+| `NEXTAUTH_SECRET` | Auth secret (generate random string)         |
+| `GITHUB_ID`       | GitHub OAuth app ID                          |
+| `GITHUB_SECRET`   | GitHub OAuth app secret                      |
+| `OPENAI_API_KEY`  | OpenAI API key for AI features               |

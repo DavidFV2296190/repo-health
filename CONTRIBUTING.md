@@ -7,8 +7,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 ### Prerequisites
 
 - Node.js 24+
-- MySQL database
-- Redis instance
+- Docker Desktop (recommended) **OR** MySQL + Redis installed locally
 - GitHub OAuth App (for authentication)
 - OpenAI API key (for AI features)
 
@@ -29,14 +28,20 @@ npm install
 
 # 5. Set up environment variables
 cp .env.example .env
-# Edit .env and fill in your values (see table below)
+# Edit .env and add your GitHub OAuth + OpenAI keys
+# DATABASE_URL and REDIS_URL defaults work with Docker Compose
 
-# 6. Run database migrations
+# 6. Start databases (using Docker Compose)
+docker compose up -d
+
+# 7. Run database migrations
 npx prisma db push
 
-# 7. Start development server
+# 8. Start development server
 npm run dev
 ```
+
+> **Note**: If you prefer not to use Docker, install MySQL and Redis locally and update the `DATABASE_URL` and `REDIS_URL` in your `.env` file accordingly.
 
 ### Environment Variables
 
