@@ -68,8 +68,10 @@ src/
 │   │   ├── issues/           # Issue analysis
 │   │   ├── anomaly/          # Activity anomaly detection
 │   │   ├── overview/         # AI-powered file-issue mapping
-│   │   └── user/             # User/auth services
+│   │   ├── user/             # User/auth services
+│   │   └── tests/            # Unit tests
 │   └── types/                # TypeScript types
+├── test/                     # Test setup and utilities
 ├── trpc/                     # tRPC config
 ├── lib/                      # Redis, Prisma, Auth
 ├── types/                    # Shared TypeScript types
@@ -125,7 +127,7 @@ Analyze pull request patterns and community contributor behavior.
 
 ### In Progress
 
-- [ ] UI polish and responsive design
+- [ ] UI polish and responsive design (50% - getting there)
 - [ ] Better error handling
 - [ ] Comprehensive test suite
 

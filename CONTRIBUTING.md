@@ -105,10 +105,17 @@ const cacheTtl = 3600;
 
 ### Testing
 
-Comprehensive tests are recommended to ensure your feature or bug fix doesn't break anything:
+**Vitest** for testing. Run tests before submitting PRs:
+
+| Command              | Description             |
+| -------------------- | ----------------------- |
+| `npm test`           | Run all tests once      |
+| `npm run test:watch` | Run tests in watch mode |
+
+**Guidelines:**
 
 - Write tests for new features when possible
-- Verify existing tests pass with `npm run lint`
+- Ensure all tests pass before submitting PRs
 - Test edge cases and error handling
 - Document test scenarios in PR description
 
@@ -134,7 +141,9 @@ src/
 ├── server/
 │   ├── routers/          # tRPC routers
 │   ├── services/         # Business logic
+│   │   └── tests/        # Unit tests
 │   └── types/            # TypeScript types
+├── test/                 # Test setup and utilities
 ├── trpc/                 # tRPC setup
 └── lib/                  # Utilities (Redis, Prisma, Auth)
 ```
