@@ -11,6 +11,7 @@ import {
   Toaster,
   Flex,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { useSession, signIn } from "next-auth/react";
 import { trpc } from "@/trpc/client";
@@ -85,14 +86,12 @@ function HomePageContent() {
       staleTime: 1000 * 60 * 5, // 5 min client cache
     });
 
-  const { data: pitfalls } = trpc.contributor.getPitfalls.useQuery(
-    searchParams!,
-    {
+  const { data: pitfalls, isLoading: isPitfallsLoading } =
+    trpc.contributor.getPitfalls.useQuery(searchParams!, {
       enabled: searchParams !== null && !!data,
       retry: false,
       staleTime: 1000 * 60 * 5,
-    }
-  );
+    });
 
   const { data: fundingInfo } = trpc.funding.getFunding.useQuery(
     searchParams!,
@@ -359,24 +358,42 @@ function HomePageContent() {
                     repo={searchParams.repo}
                   />
                 )}
-                {pitfalls && searchParams && (
-                  <PitfallsSummaryCard
-                    analyzedCount={pitfalls.analyzedCount}
-                    topCategories={Object.entries(
-                      pitfalls.analyses.reduce(
-                        (acc: Record<string, number>, item) => {
-                          acc[item.category] = (acc[item.category] || 0) + 1;
-                          return acc;
-                        },
-                        {}
+                {isPitfallsLoading && searchParams ? (
+                  <Box
+                    bg="#161b22"
+                    border="1px solid #30363d"
+                    p={6}
+                    borderRadius="lg"
+                    minH="200px"
+                  >
+                    <VStack gap={4} justify="center" h="100%">
+                      <Spinner size="lg" color="#f0883e" />
+                      <Text color="#8b949e">
+                        Analyzing contribution insights...
+                      </Text>
+                    </VStack>
+                  </Box>
+                ) : (
+                  pitfalls &&
+                  searchParams && (
+                    <PitfallsSummaryCard
+                      analyzedCount={pitfalls.analyzedCount}
+                      topCategories={Object.entries(
+                        pitfalls.analyses.reduce(
+                          (acc: Record<string, number>, item) => {
+                            acc[item.category] = (acc[item.category] || 0) + 1;
+                            return acc;
+                          },
+                          {}
+                        )
                       )
-                    )
-                      .map(([category, count]) => ({ category, count }))
-                      .sort((a, b) => b.count - a.count)}
-                    topPattern={pitfalls.patterns[0] || null}
-                    owner={searchParams.owner}
-                    repo={searchParams.repo}
-                  />
+                        .map(([category, count]) => ({ category, count }))
+                        .sort((a, b) => b.count - a.count)}
+                      topPattern={pitfalls.patterns[0] || null}
+                      owner={searchParams.owner}
+                      repo={searchParams.repo}
+                    />
+                  )
                 )}
               </SimpleGrid>
 
