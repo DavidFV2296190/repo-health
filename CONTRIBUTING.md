@@ -162,6 +162,9 @@ src/
 
 ---
 
-## Questions?
+## Questions or Ideas?
 
-Open an issue or reach out on GitHub Discussions.
+- **Bug reports / specific issues**: Open a GitHub Issue
+- **Feature ideas / suggestions / general questions**: Open an issue or reach out on GitHub Discussions.
+
+I'd love to hear your ideas for improving repo-health!

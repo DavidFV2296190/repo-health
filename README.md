@@ -34,7 +34,7 @@ A **contributor-first platform** for understanding GitHub repositories and makin
 ## Tech Stack
 
 **Frontend**: Next.js 16, React 19, Chakra UI  
-**Backend**: tRPC, Octokit, Zod  
+**Backend**: tRPC, Octokit, UNGH (rate-limit-free GitHub proxy), Zod  
 **Data**: MySQL (Prisma), Redis, OSV API
 
 ---
@@ -124,6 +124,7 @@ Analyze pull request patterns and community contributor behavior.
 - [x] Contribution Insights - Spam detection and AI-powered rejection analysis
 - [x] Funding Promotion - Parse FUNDING.yml and display sponsor links
 - [x] Banger Commits - Highlight significant commits with scoring (template-first, AI fallback) - Could be improved
+- [x] UNGH Integration - Rate-limit-free GitHub proxy for public repositories (repo info, contributors, file tree)
 
 ### In Progress
 
@@ -141,7 +142,7 @@ Analyze pull request patterns and community contributor behavior.
 | Common Setup Mistakes       | Extract patterns from CONTRIBUTING.md and failed CI builds                  |
 | Experience Level Filter     | Dropdown: First Contributor, Beginner, Expert at Stack, I am Cooked         |
 
-These are my current ideas. Have a feature request? Open an issue.
+These are my current ideas. Have a feature request or new idea? Use GitHub Discussions or open an issue.
 
 ---
 
